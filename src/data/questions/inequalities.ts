@@ -1,0 +1,75 @@
+import { type QSeed, r } from './types';
+
+export const INEQUALITIES: QSeed[] = [
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'easy',
+    stem: 'How many integers satisfy |x - 3| < 5?',
+    answer: '9',
+    solution: `|x - 3| < 5 reads as "x is within 5 of 3": -2 < x < 8.\n\nIntegers strictly between: -1, 0, 1, 2, 3, 4, 5, 6, 7 -> **9 integers**.\n\nThe endpoints -2 and 8 are excluded because the inequality is strict.`,
+    verify: () => { let c = 0; for (let x = -20; x <= 20; x++) if (Math.abs(x - 3) < 5) c++; return c; },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the smallest positive integer x satisfying |2x - 4| ≥ 6?',
+    answer: '5',
+    solution: `The inequality splits into two rays:\n\n2x - 4 >= 6 -> x >= 5, **or** 2x - 4 <= -6 -> x <= -1.\n\nThe smallest positive integer is **5**.`,
+    verify: () => { for (let x = 1; x <= 50; x++) if (Math.abs(2 * x - 4) >= 6) return x; return -1; },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'easy',
+    stem: 'How many integers satisfy (x - 2)(x - 5) < 0?',
+    answer: '2',
+    solution: `A product of two factors is negative only between the roots: 2 < x < 5.\n\nIntegers: 3 and 4 -> **2 integers**.`,
+    verify: () => { let c = 0; for (let x = -20; x <= 20; x++) if ((x - 2) * (x - 5) < 0) c++; return c; },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'easy',
+    stem: 'How many integers satisfy x² - 5x + 6 < 0?',
+    answer: '0',
+    solution: `Factorise: (x - 2)(x - 3) < 0 -> 2 < x < 3.\n\nThere is **no integer** strictly between 2 and 3, so the answer is **0**.\n\nA reminder to solve first and count second.`,
+    verify: () => { let c = 0; for (let x = -20; x <= 20; x++) if (x * x - 5 * x + 6 < 0) c++; return c; },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the minimum value of |x| + |x - 4|?',
+    answer: '4',
+    solution: `Read it as a **distance**: the sum of distances from x to 0 and from x to 4.\n\nThat sum is minimised anywhere between them, where it equals the gap itself: **4**.\n\nFor |x - a| + |x - b| the minimum is always |a - b|.`,
+    verify: () => { let m = Infinity; for (let x = -100; x <= 100; x += 0.5) m = Math.min(m, Math.abs(x) + Math.abs(x - 4)); return r(m); },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'medium',
+    stem: 'For what value of x is |x - 2| = |x - 6|?',
+    answer: '4',
+    solution: `The point equidistant from 2 and 6 is their **midpoint**: (2 + 6)/2 = **4**.\n\nNo algebra needed once you read modulus as distance.`,
+    verify: () => r((2 + 6) / 2),
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'medium',
+    stem: 'How many integers satisfy |3x + 2| ≤ 8?',
+    answer: '6',
+    solution: `-8 <= 3x + 2 <= 8 -> -10 <= 3x <= 6 -> -10/3 <= x <= 2.\n\nSince -10/3 is about -3.33, the integers are -3, -2, -1, 0, 1, 2 -> **6 integers**.`,
+    verify: () => { let c = 0; for (let x = -20; x <= 20; x++) if (Math.abs(3 * x + 2) <= 8) c++; return c; },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the smallest integer x greater than 1 satisfying (x - 1)/(x + 2) > 0?',
+    answer: '2',
+    solution: `The quotient is positive when numerator and denominator share a sign:\n\nx > 1, **or** x < -2.\n\nThe smallest integer greater than 1 in the solution set is **2**.\n\nNever cross-multiply by (x + 2) — its sign is unknown and would flip the inequality.`,
+    verify: () => { for (let x = 2; x <= 50; x++) if ((x - 1) / (x + 2) > 0) return x; return -1; },
+  },
+  {
+    topic: 'inequalities', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the smallest integer satisfying 3x - 7 > 2?',
+    answer: '4',
+    solution: `3x > 9 -> x > 3.\n\nThe smallest **integer** strictly greater than 3 is **4**.`,
+    verify: () => { for (let x = -10; x <= 50; x++) if (3 * x - 7 > 2) return x; return -1; },
+  },
+  {
+    topic: 'inequalities', type: 'MCQ', difficulty: 'hard',
+    stem: 'If -3 ≤ x ≤ 5, what is the maximum value of x²?',
+    options: ['9', '16', '25', '30'],
+    answer: '25',
+    solution: `x^2 is not monotonic on this interval, so check **both** endpoints.\n\n(-3)^2 = 9 and 5^2 = 25.\n\nMaximum = **25** (the minimum is 0, at x = 0, which is inside the interval).`,
+    verify: () => { let m = -Infinity; for (let x = -3; x <= 5; x += 0.01) m = Math.max(m, x * x); return String(Math.round(m)); },
+  },
+];

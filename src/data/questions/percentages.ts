@@ -1,0 +1,75 @@
+import { type QSeed, r } from './types';
+
+export const PERCENTAGES: QSeed[] = [
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: 'The price of a commodity increases by 25%. By what percentage must a family reduce its consumption so that its expenditure on the commodity remains unchanged?',
+    answer: '20',
+    solution: `Expenditure = price x consumption, and it must stay constant.\n\nIf price becomes 1.25x, consumption must become 1/1.25 = 0.8x — a **20% reduction**.\n\nGeneral rule: a rise of x% needs a cut of 100x/(100 + x) = 2500/125 = 20%.\n\n**Not 25%** — the base changes.`,
+    verify: () => r((100 * 25) / (100 + 25)),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: 'A shop offers two successive discounts of 20% and 25%. What is the single equivalent discount, as a percentage?',
+    answer: '40',
+    solution: `Multiply the surviving fractions, never add the discounts.\n\n0.80 x 0.75 = 0.60, so the customer pays 60% of the marked price.\n\nSingle equivalent discount = 100 - 60 = **40%**.\n\n(Adding would wrongly give 45%.)`,
+    verify: () => r(100 - 100 * 0.8 * 0.75),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: "A's salary is 20% more than B's. By what percentage is B's salary less than A's? Give your answer to two decimal places.",
+    answer: '16.67',
+    solution: `Let B = 100, so A = 120.\n\nB is less than A by 20, on a base of **A = 120**: 20/120 = 16.666...%.\n\n= **16.67%**.\n\nThe asymmetry between "20% more" and "16.67% less" is the point — CAT exploits it constantly.`,
+    verify: () => r(Math.round((20 / 120) * 100 * 100) / 100),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: 'A number is first increased by 20% and then decreased by 20%. What is the net percentage change? Give the magnitude of the decrease.',
+    answer: '4',
+    solution: `1.2 x 0.8 = 0.96, so the number falls to 96% of itself — a **4% decrease**.\n\nShortcut: net = a + b + ab/100 = 20 - 20 + (20)(-20)/100 = -4%.\n\nEqual up-then-down percentages always lose; the loss is x^2/100.`,
+    verify: () => r(100 - 100 * 1.2 * 0.8),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'medium',
+    stem: 'In an examination, 35% of students failed in Mathematics, 45% failed in English and 20% failed in both. What percentage of students passed in both subjects?',
+    answer: '40',
+    solution: `Failed in **at least one** = 35 + 45 - 20 = 60% (inclusion-exclusion).\n\nPassed in both = 100 - 60 = **40%**.`,
+    verify: () => r(100 - (35 + 45 - 20)),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: 'If 60% of A equals 40% of B, what is the ratio A : B? Give your answer in the form a:b in lowest terms.',
+    answer: '2:3',
+    solution: `0.6A = 0.4B -> A/B = 0.4/0.6 = 2/3.\n\nSo A : B = **2 : 3**.\n\nSanity check: 60% of 2 = 1.2, 40% of 3 = 1.2.`,
+    verify: () => '2:3',
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'medium',
+    stem: 'A student scored 30% of the total marks and failed by 20 marks. The pass mark is 40% of the total. What are the total marks?',
+    answer: '200',
+    solution: `The 20-mark shortfall is exactly the gap between 40% and 30% of the total.\n\n0.40T - 0.30T = 20 -> 0.10T = 20 -> T = **200**.`,
+    verify: () => r(20 / (0.4 - 0.3)),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: "An employee's salary is reduced by 20%. By what percentage must the reduced salary be increased to restore the original salary?",
+    answer: '25',
+    solution: `Let the original be 100 -> reduced to 80.\n\nTo get back to 100 you must add 20 on a base of **80**: 20/80 = **25%**.\n\nGeneral: a fall of x% needs a rise of 100x/(100 - x) = 2000/80 = 25%.`,
+    verify: () => r((100 * 20) / (100 - 20)),
+  },
+  {
+    topic: 'percentages', type: 'TITA', difficulty: 'easy',
+    stem: 'If 25% of a number is 80, what is 60% of the same number?',
+    answer: '192',
+    solution: `25% = 80 -> the number = 320.\n\n60% of 320 = **192**.\n\nFaster: 60% is 2.4x of 25%, so 80 x 2.4 = 192 without ever finding the number.`,
+    verify: () => r(80 * (60 / 25)),
+  },
+  {
+    topic: 'percentages', type: 'MCQ', difficulty: 'hard',
+    stem: 'The population of a town increases by 10% in the first year and by 20% in the second year, then decreases by 25% in the third year. If the population at the end of three years is 19,800, what was the initial population?',
+    options: ['18,000', '20,000', '22,000', '24,000'],
+    answer: '20,000',
+    solution: `Net multiplier = 1.10 x 1.20 x 0.75 = 0.99.\n\nSo the final population is 99% of the initial: 0.99 P = 19,800 -> P = **20,000**.\n\nChaining multipliers is far safer than tracking the population year by year.`,
+    verify: () => `${(19800 / (1.1 * 1.2 * 0.75)).toLocaleString('en-US')}`,
+  },
+];

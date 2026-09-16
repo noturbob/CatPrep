@@ -1,0 +1,76 @@
+import { type QSeed, r } from './types';
+
+export const AVERAGES: QSeed[] = [
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'easy',
+    stem: 'The average of 5 numbers is 20. When one number is removed, the average of the remaining 4 becomes 18. What was the number removed?',
+    answer: '28',
+    solution: `Convert averages into **sums** immediately.\n\nOriginal sum = 5 x 20 = 100. New sum = 4 x 18 = 72.\n\nRemoved = 100 - 72 = **28**.`,
+    verify: () => r(5 * 20 - 4 * 18),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'easy',
+    stem: 'The average of 4 numbers is 15 and the average of the first 3 of them is 12. What is the fourth number?',
+    answer: '24',
+    solution: `Total sum = 4 x 15 = 60. Sum of first three = 3 x 12 = 36.\n\nFourth = 60 - 36 = **24**.`,
+    verify: () => r(4 * 15 - 3 * 12),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'medium',
+    stem: 'A 40 litre mixture contains 10% water, the rest milk. How many litres of water must be added so that water becomes 20% of the new mixture?',
+    answer: '5',
+    solution: `**Milk is the quantity that does not change.** Milk = 36 L.\n\nAfter adding water, milk must be 80% of the new total: 0.8T = 36 -> T = 45 L.\n\nWater added = 45 - 40 = **5 litres**.`,
+    verify: () => r((40 * 0.9) / 0.8 - 40),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'easy',
+    stem: 'In what ratio must rice costing Rs 30 per kg be mixed with rice costing Rs 40 per kg so that the mixture costs Rs 34 per kg? Give your answer in the form a:b in lowest terms.',
+    answer: '3:2',
+    solution: `**Alligation.**\n\nCheap 30 --- Mean 34 --- Dear 40\n\nRatio = (Dear - Mean) : (Mean - Cheap) = (40 - 34) : (34 - 30) = 6 : 4 = **3 : 2**.`,
+    tags: ['alligation'],
+    verify: () => '3:2',
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'medium',
+    stem: 'The average age of 30 students in a class is 14 years. When the teacher’s age is included, the average becomes 15 years. What is the teacher’s age, in years?',
+    answer: '45',
+    solution: `Sum of students = 30 x 14 = 420. Sum including teacher = 31 x 15 = 465.\n\nTeacher = 465 - 420 = **45 years**.\n\nDeviation shortcut: the teacher must supply his own 15 plus 1 extra year for each of the 30 students -> 15 + 30 = 45.`,
+    verify: () => r(31 * 15 - 30 * 14),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'hard',
+    stem: 'From a vessel containing 40 litres of pure milk, 4 litres are removed and replaced with water. This operation is performed once more. How many litres of milk remain?',
+    answer: '32.4',
+    solution: `Repeated replacement: remaining pure quantity = V(1 - x/V)^n.\n\n= 40 x (1 - 4/40)^2 = 40 x (0.9)^2 = 40 x 0.81 = **32.4 litres**.\n\nEach operation keeps 90% of whatever milk was there, so the effect is multiplicative, not a flat 8 L loss.`,
+    verify: () => r(40 * (1 - 4 / 40) ** 2),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'hard',
+    stem: 'The average of 11 results is 50. The average of the first 6 is 49 and the average of the last 6 is 52. What is the 6th result?',
+    answer: '56',
+    solution: `The 6th result is counted in **both** groups of six, so it is double-counted.\n\n6(49) + 6(52) - 11(50) = 294 + 312 - 550 = **56**.`,
+    verify: () => r(6 * 49 + 6 * 52 - 11 * 50),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'medium',
+    stem: 'Tea costing Rs 60 per kg is mixed with tea costing Rs 80 per kg in the ratio 3 : 2. The mixture is sold at a 20% profit. What is the selling price per kg, in rupees?',
+    answer: '81.6',
+    solution: `Cost of the mixture = (3 x 60 + 2 x 80)/5 = (180 + 160)/5 = Rs 68 per kg.\n\nSP at 20% profit = 68 x 1.2 = **Rs 81.60**.`,
+    verify: () => r(((3 * 60 + 2 * 80) / 5) * 1.2),
+  },
+  {
+    topic: 'averages-mixtures', type: 'TITA', difficulty: 'medium',
+    stem: 'Vessel A contains milk and water in the ratio 5 : 1 and vessel B in the ratio 3 : 1. Equal quantities from each are mixed. What fraction of the new mixture is milk? Give your answer in the form a/b in lowest terms.',
+    answer: '19/24',
+    solution: `Milk fraction in A = 5/6; in B = 3/4.\n\nEqual quantities, so the new fraction is the simple average:\n\n(5/6 + 3/4)/2 = (10/12 + 9/12)/2 = (19/12)/2 = **19/24**.`,
+    verify: () => '19/24',
+  },
+  {
+    topic: 'averages-mixtures', type: 'MCQ', difficulty: 'medium',
+    stem: 'The average of the first 10 natural numbers is:',
+    options: ['5', '5.5', '6', '6.5'],
+    answer: '5.5',
+    solution: `Sum of 1 to 10 = 10 x 11/2 = 55. Average = 55/10 = **5.5**.\n\nFor any evenly spaced set the average is simply (first + last)/2 = (1 + 10)/2 = 5.5.`,
+    verify: () => String(r((10 * 11) / 2 / 10)),
+  },
+];

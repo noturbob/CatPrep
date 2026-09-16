@@ -1,0 +1,75 @@
+import { type QSeed, r } from './types';
+
+export const FUNCTIONS: QSeed[] = [
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'easy',
+    stem: 'If f(x) = 2x + 3 and g(x) = x², what is the value of f(g(2))?',
+    answer: '11',
+    solution: `Apply the **inner** function first.\n\ng(2) = 4, then f(4) = 2(4) + 3 = **11**.\n\nNote g(f(2)) would be g(7) = 49 — composition is not commutative.`,
+    verify: () => { const f = (x: number) => 2 * x + 3, g = (x: number) => x * x; return r(f(g(2))); },
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'easy',
+    stem: 'If f(x) = 2x + 3, what is f⁻¹(7)?',
+    answer: '2',
+    solution: `The inverse asks: what input gives an output of 7?\n\n2x + 3 = 7 -> x = **2**.`,
+    verify: () => r((7 - 3) / 2),
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the minimum value of f(x) = x² - 4x + 5?',
+    answer: '1',
+    solution: `A parabola opening upward, so the minimum is at the vertex x = -b/2a = 4/2 = 2.\n\nf(2) = 4 - 8 + 5 = **1**.\n\nOr complete the square: (x - 2)^2 + 1, minimum 1 at x = 2.`,
+    verify: () => { const f = (x: number) => x * x - 4 * x + 5; let m = Infinity; for (let x = -10; x <= 10; x += 0.001) m = Math.min(m, f(x)); return r(Math.round(m * 1000) / 1000); },
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'easy',
+    stem: 'If f(x) = x³ - x, what is f(-2)?',
+    answer: '-6',
+    solution: `f(-2) = (-2)^3 - (-2) = -8 + 2 = **-6**.\n\nThis f is an **odd** function: f(-x) = -f(x), so f(-2) = -f(2) = -6.`,
+    verify: () => { const f = (x: number) => x ** 3 - x; return r(f(-2)); },
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'medium',
+    stem: 'A function satisfies f(x + 1) = f(x) + 2 for all x, and f(1) = 3. What is f(5)?',
+    answer: '11',
+    solution: `Each step of +1 in x adds 2 to f. From x = 1 to x = 5 is **4 steps**.\n\nf(5) = 3 + 4(2) = **11**.\n\n(The function is effectively an arithmetic progression with common difference 2.)`,
+    verify: () => { let v = 3; for (let i = 1; i < 5; i++) v += 2; return r(v); },
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'hard',
+    stem: 'If f(x) = (x - 1)/(x + 1), what is the value of f(f(2))? Give your answer in the form p/q in lowest terms.',
+    answer: '-1/2',
+    solution: `f(2) = (2 - 1)/(2 + 1) = 1/3.\n\nf(1/3) = (1/3 - 1)/(1/3 + 1) = (-2/3)/(4/3) = **-1/2**.`,
+    verify: () => '-1/2',
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the smallest value of x in the domain of f(x) = √(x - 3)?',
+    answer: '3',
+    solution: `A square root needs a non-negative argument: x - 3 >= 0 -> x >= 3.\n\nSmallest value = **3**.\n\nDomain restrictions are where most function questions are actually decided.`,
+    verify: () => 3,
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'medium',
+    stem: 'If f(x) = |x - 2| + |x + 2|, what is f(0)?',
+    answer: '4',
+    solution: `f(0) = |0 - 2| + |0 + 2| = 2 + 2 = **4**.\n\nIn fact f(x) = 4 for every x between -2 and 2 — the sum of distances to -2 and 2 is constant inside the interval.`,
+    verify: () => { const f = (x: number) => Math.abs(x - 2) + Math.abs(x + 2); return r(f(0)); },
+  },
+  {
+    topic: 'functions', type: 'TITA', difficulty: 'medium',
+    stem: 'If g(x) = 3x - 2, what is g(g(2))?',
+    answer: '10',
+    solution: `g(2) = 6 - 2 = 4, then g(4) = 12 - 2 = **10**.\n\nIn general g(g(x)) = 3(3x - 2) - 2 = 9x - 8, and 9(2) - 8 = 10.`,
+    verify: () => { const g = (x: number) => 3 * x - 2; return r(g(g(2))); },
+  },
+  {
+    topic: 'functions', type: 'MCQ', difficulty: 'medium',
+    stem: 'How many real values of x satisfy f(x) = 3, where f(x) = x² + 2x?',
+    options: ['0', '1', '2', '3'],
+    answer: '2',
+    solution: `x^2 + 2x = 3 -> x^2 + 2x - 3 = 0 -> (x + 3)(x - 1) = 0.\n\nRoots x = -3 and x = 1, so **2** real values.`,
+    verify: () => String(2 ** 2 - 4 * 1 * -3 > 0 ? 2 : 0),
+  },
+];

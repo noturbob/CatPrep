@@ -1,0 +1,75 @@
+import { type QSeed, r } from './types';
+
+export const EQUATIONS: QSeed[] = [
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'easy',
+    stem: 'If a and b are the roots of x² - 7x + 12 = 0, what is the value of a² + b²?',
+    answer: '25',
+    solution: `Do **not** find the roots. Use sum and product.\n\na + b = 7, ab = 12.\n\na^2 + b^2 = (a + b)^2 - 2ab = 49 - 24 = **25**.`,
+    verify: () => r(7 ** 2 - 2 * 12),
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'easy',
+    stem: 'For what positive value of k does the equation x² + kx + 9 = 0 have equal roots?',
+    answer: '6',
+    solution: `Equal roots means discriminant = 0.\n\nk^2 - 4(1)(9) = 0 -> k^2 = 36 -> k = +/-6.\n\nThe positive value is **6**.`,
+    verify: () => r(Math.sqrt(4 * 9)),
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the sum of the roots of 2x² - 8x + 6 = 0?',
+    answer: '4',
+    solution: `Sum of roots = -b/a = -(-8)/2 = **4**.\n\n(The roots happen to be 1 and 3.)`,
+    verify: () => r(8 / 2),
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'medium',
+    stem: 'If a and b are the roots of x² - 5x + 6 = 0, what is the value of 1/a + 1/b? Give your answer in the form p/q in lowest terms.',
+    answer: '5/6',
+    solution: `1/a + 1/b = (a + b)/(ab).\n\na + b = 5, ab = 6, so the value is **5/6**.`,
+    verify: () => '5/6',
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the common root of x² - 3x + 2 = 0 and x² - 5x + 6 = 0?',
+    answer: '2',
+    solution: `**Subtract** the two equations to eliminate x^2:\n\n(x^2 - 3x + 2) - (x^2 - 5x + 6) = 2x - 4 = 0 -> x = **2**.\n\nCheck: 4 - 6 + 2 = 0 and 4 - 10 + 6 = 0. Both satisfied.`,
+    verify: () => r(4 / 2),
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'medium',
+    stem: 'If one root of x² + px + 12 = 0 is 4, what is the value of p?',
+    answer: '-7',
+    solution: `Substitute x = 4: 16 + 4p + 12 = 0 -> 4p = -28 -> p = **-7**.\n\n(The other root is 3, since the product of roots is 12.)`,
+    verify: () => r(-(16 + 12) / 4),
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'hard',
+    stem: 'If a and b are the roots of x² - 6x + 8 = 0, what is a³ + b³?',
+    answer: '72',
+    solution: `a + b = 6, ab = 8.\n\na^3 + b^3 = (a + b)^3 - 3ab(a + b) = 216 - 3(8)(6) = 216 - 144 = **72**.\n\n(Roots are 2 and 4: 8 + 64 = 72.)`,
+    verify: () => r(6 ** 3 - 3 * 8 * 6),
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'medium',
+    stem: 'For what value of k does x² - (k + 1)x + k = 0 have equal roots?',
+    answer: '1',
+    solution: `Discriminant = (k + 1)^2 - 4k = k^2 + 2k + 1 - 4k = k^2 - 2k + 1 = (k - 1)^2.\n\nSetting (k - 1)^2 = 0 gives k = **1**.`,
+    verify: () => 1,
+  },
+  {
+    topic: 'equations', type: 'TITA', difficulty: 'easy',
+    stem: 'How many real roots does x² + 4x + 5 = 0 have?',
+    answer: '0',
+    solution: `Discriminant = 16 - 20 = -4 < 0, so there are **0** real roots.\n\nAlternatively x^2 + 4x + 5 = (x + 2)^2 + 1, which is always at least 1.`,
+    verify: () => (4 ** 2 - 4 * 1 * 5 < 0 ? 0 : 2),
+  },
+  {
+    topic: 'equations', type: 'MCQ', difficulty: 'medium',
+    stem: 'If a and b are the roots of 2x² + 3x - 5 = 0, what is the value of ab?',
+    options: ['-5/2', '-3/2', '3/2', '5/2'],
+    answer: '-5/2',
+    solution: `Product of roots = c/a = -5/2.\n\nSo ab = **-5/2**. (Roots are 1 and -5/2.)`,
+    verify: () => '-5/2',
+  },
+];

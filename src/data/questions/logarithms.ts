@@ -1,0 +1,75 @@
+import { type QSeed, r } from './types';
+
+export const LOGARITHMS: QSeed[] = [
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the value of log₂ 32?',
+    answer: '5',
+    solution: `Ask: 2 to what power gives 32?\n\n2^5 = 32, so log_2(32) = **5**.`,
+    verify: () => r(Math.log(32) / Math.log(2)),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the value of log₃ 81?',
+    answer: '4',
+    solution: `Ask: 3 to what power gives 81?\n\n3^1=3, 3^2=9, 3^3=27, 3^4=81 -> log_3(81) = **4**.\n\nWorth memorising the small powers of 2 and 3 — CAT log questions almost always reduce to recognising one.`,
+    verify: () => r(Math.log(81) / Math.log(3)),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the value of log₁₀ 100 + log₁₀ 1000?',
+    answer: '5',
+    solution: `log(100) = 2 and log(1000) = 3, so the sum is **5**.\n\nEquivalently log(100 x 1000) = log(100000) = 5, using log m + log n = log(mn).`,
+    verify: () => r(Math.log10(100) + Math.log10(1000)),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the value of log₂ 8 + log₃ 9?',
+    answer: '5',
+    solution: `log_2(8) = 3 and log_3(9) = 2.\n\nSum = **5**. Different bases cannot be combined, so evaluate each separately.`,
+    verify: () => r(Math.log(8) / Math.log(2) + Math.log(9) / Math.log(3)),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the value of log₄ 64?',
+    answer: '3',
+    solution: `4^3 = 64, so the value is **3**.\n\nBase change also works: log(64)/log(4) = 6log2/2log2 = 3.`,
+    verify: () => r(Math.log(64) / Math.log(4)),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'medium',
+    stem: 'If log x = 2 log 3 + 3 log 2 (all logs to the same base), what is x?',
+    answer: '72',
+    solution: `2 log 3 = log 9 and 3 log 2 = log 8, using p log m = log(m^p).\n\nlog x = log 9 + log 8 = log 72 -> x = **72**.`,
+    verify: () => r(3 ** 2 * 2 ** 3),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'hard',
+    stem: 'Solve for x: log₂ x + log₂ (x - 2) = 3.',
+    answer: '4',
+    solution: `Combine: log_2(x(x - 2)) = 3 -> x(x - 2) = 8.\n\nx^2 - 2x - 8 = 0 -> (x - 4)(x + 2) = 0 -> x = 4 or x = -2.\n\n**Reject x = -2**: the argument of a log must be positive.\n\nAnswer: **4**.`,
+    verify: () => { for (let x = 1; x <= 20; x += 0.5) if (x > 2 && Math.abs(Math.log2(x) + Math.log2(x - 2) - 3) < 1e-9) return r(x); return -1; },
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the value of 2 raised to the power log₂ 7?',
+    answer: '7',
+    solution: `a^(log_a x) = x — the exponential and the logarithm with the same base undo each other.\n\nSo the value is **7**.`,
+    verify: () => r(2 ** Math.log2(7)),
+  },
+  {
+    topic: 'logarithms', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the value of (log₅ 125) × (log₃ 27)?',
+    answer: '9',
+    solution: `log_5(125) = 3 and log_3(27) = 3.\n\nProduct = **9**.`,
+    verify: () => r((Math.log(125) / Math.log(5)) * (Math.log(27) / Math.log(3))),
+  },
+  {
+    topic: 'logarithms', type: 'MCQ', difficulty: 'medium',
+    stem: 'If log₂ x = 5, what is the value of x?',
+    options: ['10', '25', '32', '64'],
+    answer: '32',
+    solution: `Rewrite the log as an index statement — that is the move for almost every log question.\n\nlog_2(x) = 5 means 2^5 = x, so x = **32**.\n\nThe distractor 25 comes from computing 5^2 instead of 2^5; the distractor 10 from reading it as 2 x 5.`,
+    verify: () => String(2 ** 5),
+  },
+];

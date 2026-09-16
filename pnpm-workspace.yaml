@@ -1,3 +1,12 @@
+# esbuild / unrs-resolver ship prebuilt platform binaries as optional deps,
+# so their postinstall scripts are no-ops here. pnpm 11 treats a skipped
+# build as fatal by default; it isn't, and blocking every build on it costs
+# more than it protects.
+strictDepBuilds: false
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
 allowBuilds:
-  sharp: false
-  unrs-resolver: false
+  esbuild: set this to true or false
+  unrs-resolver: set this to true or false

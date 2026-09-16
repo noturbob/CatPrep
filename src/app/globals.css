@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------ *
+ * catprep — dark-first, dense, keyboard-driven.
+ * This is a tool used four hours a day, so it reads like a terminal,
+ * not like consumer edtech. The one exception is the mock-taking
+ * screen, which deliberately mimics the real TCS exam chrome.
+ * ------------------------------------------------------------------ */
+
+@theme {
+  --color-bg:        #0b0b0d;
+  --color-panel:     #131316;
+  --color-panel-2:   #1a1a1f;
+  --color-border:    #26262c;
+  --color-border-hi: #34343c;
+
+  --color-fg:        #e9e9ec;
+  --color-muted:     #8b8b95;
+  --color-faint:     #5c5c66;
+
+  /* amber = time pressure: the countdown, the daily target, what's due */
+  --color-accent:    #f5a524;
+  --color-accent-dim:#5c4114;
+
+  --color-ok:        #30c46b;
+  --color-ok-dim:    #14412a;
+  --color-bad:       #f04f4f;
+  --color-info:      #4f9cf0;
+  /* Data-series identity. Validated with the dataviz palette checker against
+     the dark surface: lightness band, chroma floor, CVD separation, contrast.
+     The worst adjacent pair (teal/pink) sits at CVD dE 6.7, which is legal
+     only with secondary encoding — so every chart using these DIRECT-LABELS
+     its marks. Do not swap these for prettier hues without re-running
+     scripts/validate_palette.js. UI chrome uses --color-accent instead;
+     text never wears a series colour, it gets a dot beside it. */
+  --color-qa:        #c08828;
+  --color-dilr:      #17a2b8;
+  --color-varc:      #d4568f;
+  --color-s4:        #7c6ce0;
+
+  /* Sequential ramp for magnitude (accuracy). Single hue, monotonic L. */
+  --color-seq-1:     #0d4a53;
+  --color-seq-2:     #11626e;
+  --color-seq-3:     #167f8f;
+  --color-seq-4:     #17a2b8;
+  --color-seq-5:     #35bdd0;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { color-scheme: dark; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* tabular figures everywhere numbers matter */
+.nums { font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+
+::selection { background: #f5a52433; }
+
+/* scrollbars that don't shout */
+* { scrollbar-width: thin; scrollbar-color: var(--color-border-hi) transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-hi);
+  border-radius: 5px;
+  border: 2px solid var(--color-bg);
+}
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* focus ring: visible, never doubled */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* prose used for concept notes and worked solutions */
+.prose-cat { line-height: 1.65; }
+.prose-cat p { margin: 0 0 0.75em; }
+.prose-cat strong { color: var(--color-fg); font-weight: 600; }
+.prose-cat ul { margin: 0 0 0.75em; padding-left: 1.15em; list-style: disc; }
+.prose-cat li { margin: 0.3em 0; }
+.prose-cat code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-panel-2);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.08em 0.34em;
 }

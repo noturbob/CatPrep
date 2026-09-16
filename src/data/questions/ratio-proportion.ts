@@ -1,0 +1,76 @@
+import { type QSeed, r } from './types';
+
+export const RATIO: QSeed[] = [
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'easy',
+    stem: 'If a : b = 3 : 4 and b : c = 6 : 7, what is a : b : c? Give your answer in the form a:b:c in lowest terms.',
+    answer: '9:12:14',
+    solution: `Make the common term **b** match. b is 4 in the first ratio and 6 in the second; LCM = 12.\n\nScale the first by 3: 9 : 12. Scale the second by 2: 12 : 14.\n\nSo a : b : c = **9 : 12 : 14**.`,
+    verify: () => '9:12:14',
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'easy',
+    stem: 'Rs 1200 is divided among three people in the ratio 3 : 4 : 5. What is the largest share, in rupees?',
+    answer: '500',
+    solution: `Total parts = 3 + 4 + 5 = 12, so one part = 1200/12 = 100.\n\nLargest share = 5 parts = **Rs 500**.`,
+    verify: () => r((1200 * 5) / 12),
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'medium',
+    stem: 'Two numbers are in the ratio 3 : 5. When 4 is added to each, the ratio becomes 5 : 7. What is the smaller number?',
+    answer: '6',
+    solution: `Let the numbers be 3k and 5k. The added 4 is **not** part of the ratio.\n\n(3k + 4)/(5k + 4) = 5/7\n7(3k + 4) = 5(5k + 4)\n21k + 28 = 25k + 20 -> 4k = 8 -> k = 2\n\nSmaller number = 3k = **6**. (Check: 6+4=10, 10+4=14, and 10:14 = 5:7.)`,
+    verify: () => r(3 * 2),
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'medium',
+    stem: 'Two numbers are in the ratio 5 : 8. If 9 is subtracted from each, the ratio becomes 2 : 5. What is the larger number?',
+    answer: '24',
+    solution: `Let them be 5k and 8k.\n\n(5k - 9)/(8k - 9) = 2/5\n5(5k - 9) = 2(8k - 9)\n25k - 45 = 16k - 18 -> 9k = 27 -> k = 3\n\nLarger = 8k = **24**. (Check: 15-9=6, 24-9=15, and 6:15 = 2:5.)`,
+    verify: () => r(8 * 3),
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'medium',
+    stem: 'A invests Rs 5000 for 12 months and B invests Rs 6000 for 8 months in a business. If the total profit is Rs 9000, what is A’s share, in rupees?',
+    answer: '5000',
+    solution: `Profit splits in the ratio of **capital x time**.\n\nA: 5000 x 12 = 60,000. B: 6000 x 8 = 48,000.\n\nRatio = 60 : 48 = 5 : 4, total 9 parts.\n\nA's share = 9000 x 5/9 = **Rs 5000**.`,
+    tags: ['partnership'],
+    verify: () => r(9000 * (5000 * 12) / (5000 * 12 + 6000 * 8)),
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'medium',
+    stem: 'If (a + b)/(a - b) = 7/3, what is a : b? Give your answer in the form a:b in lowest terms.',
+    answer: '5:2',
+    solution: `Apply **componendo-dividendo** in reverse.\n\nIf (a+b)/(a-b) = 7/3, then a/b = (7 + 3)/(7 - 3) = 10/4 = 5/2.\n\nSo a : b = **5 : 2**. (Check: (5+2)/(5-2) = 7/3.)\n\nDoing this by expanding gives 3a + 3b = 7a - 7b -> 10b = 4a, the same thing but slower.`,
+    verify: () => '5:2',
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'easy',
+    stem: 'If x : y = 2 : 3, what is the value of (3x + 2y)/(2x + 3y)? Give your answer as a fraction in the form a/b.',
+    answer: '12/13',
+    solution: `Substitute x = 2k, y = 3k — the k cancels.\n\n(3(2k) + 2(3k))/(2(2k) + 3(3k)) = (6k + 6k)/(4k + 9k) = 12k/13k = **12/13**.`,
+    verify: () => `${3 * 2 + 2 * 3}/${2 * 2 + 3 * 3}`,
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'easy',
+    stem: 'Rs 500 is divided between A and B such that A gets 3/2 of what B gets. How much does A get, in rupees?',
+    answer: '300',
+    solution: `A : B = 3 : 2, total 5 parts.\n\nA = 500 x 3/5 = **Rs 300** (and B gets 200).`,
+    verify: () => r((500 * 3) / 5),
+  },
+  {
+    topic: 'ratio-proportion', type: 'TITA', difficulty: 'easy',
+    stem: 'Three numbers are in the ratio 2 : 3 : 5 and their sum is 200. What is the middle number?',
+    answer: '60',
+    solution: `Total parts = 10, so one part = 20.\n\nMiddle number = 3 parts = **60**.`,
+    verify: () => r((200 * 3) / 10),
+  },
+  {
+    topic: 'ratio-proportion', type: 'MCQ', difficulty: 'hard',
+    stem: 'The ratio of milk to water in a 60 litre mixture is 7 : 3. How many litres of water must be added to make the ratio 7 : 5?',
+    options: ['8 litres', '10 litres', '12 litres', '15 litres'],
+    answer: '12 litres',
+    solution: `Milk = 60 x 7/10 = 42 L, water = 18 L.\n\nMilk does not change, so in the new ratio 7 parts = 42 L -> 1 part = 6 L.\n\nNew water = 5 parts = 30 L, so add 30 - 18 = **12 litres**.\n\nTracking the quantity that stays constant is the whole trick.`,
+    verify: () => `${r((60 * 0.7 / 7) * 5 - 60 * 0.3)} litres`,
+  },
+];

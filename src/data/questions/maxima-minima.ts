@@ -1,0 +1,75 @@
+import { type QSeed, r } from './types';
+
+export const MAXIMA: QSeed[] = [
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the minimum value of x² - 6x + 11?',
+    answer: '2',
+    solution: `Opens upward, so the vertex is the minimum: x = -b/2a = 6/2 = 3.\n\nValue = 9 - 18 + 11 = **2**.\n\nCompleting the square: (x - 3)^2 + 2.`,
+    verify: () => { let m = Infinity; for (let x = -20; x <= 20; x += 0.001) m = Math.min(m, x * x - 6 * x + 11); return r(Math.round(m * 1000) / 1000); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'medium',
+    stem: 'For x > 0, what is the minimum value of x + 4/x?',
+    answer: '4',
+    solution: `**AM-GM**: for positive a, b, (a + b)/2 >= sqrt(ab).\n\n(x + 4/x)/2 >= sqrt(x . 4/x) = 2, so x + 4/x >= **4**.\n\nEquality when x = 4/x, i.e. x = 2.\n\nGeneral: x + k/x has minimum 2*sqrt(k).`,
+    verify: () => { let m = Infinity; for (let x = 0.001; x <= 20; x += 0.001) m = Math.min(m, x + 4 / x); return r(Math.round(m * 100) / 100); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the maximum value of -x² + 4x + 1?',
+    answer: '5',
+    solution: `The coefficient of x^2 is negative, so the parabola opens downward and the vertex is a **maximum**.\n\nx = -b/2a = -4/(-2) = 2 -> value = -4 + 8 + 1 = **5**.`,
+    verify: () => { let m = -Infinity; for (let x = -20; x <= 20; x += 0.001) m = Math.max(m, -x * x + 4 * x + 1); return r(Math.round(m * 1000) / 1000); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the minimum value of |x - 1| + |x - 5|?',
+    answer: '4',
+    solution: `Sum of distances from x to 1 and to 5. Minimised anywhere **between** them, where it equals the gap: 5 - 1 = **4**.`,
+    verify: () => { let m = Infinity; for (let x = -20; x <= 20; x += 0.01) m = Math.min(m, Math.abs(x - 1) + Math.abs(x - 5)); return r(Math.round(m * 100) / 100); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'easy',
+    stem: 'Two positive numbers have a sum of 20. What is their maximum possible product?',
+    answer: '100',
+    solution: `For a **fixed sum**, the product is maximised when the numbers are equal.\n\n10 x 10 = **100**.\n\n(This is AM-GM again: the product is largest at equality.)`,
+    verify: () => { let m = -Infinity; for (let a = 0; a <= 20; a += 0.01) m = Math.max(m, a * (20 - a)); return r(Math.round(m)); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'medium',
+    stem: 'For x > 0, what is the minimum value of x + 9/x?',
+    answer: '6',
+    solution: `Minimum = 2*sqrt(k) with k = 9 -> 2 x 3 = **6**, attained at x = 3.`,
+    verify: () => { let m = Infinity; for (let x = 0.001; x <= 30; x += 0.001) m = Math.min(m, x + 9 / x); return r(Math.round(m * 100) / 100); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'hard',
+    stem: 'What is the minimum value of |x - 2| + |x - 4| + |x - 6|?',
+    answer: '4',
+    solution: `For an **odd** number of points, the minimum is at the **median**, here x = 4.\n\nValue = |4-2| + |4-4| + |4-6| = 2 + 0 + 2 = **4**.\n\nThe median, not the mean — the mean happens to coincide here but generally does not.`,
+    verify: () => { let m = Infinity; for (let x = -20; x <= 20; x += 0.01) m = Math.min(m, Math.abs(x - 2) + Math.abs(x - 4) + Math.abs(x - 6)); return r(Math.round(m * 100) / 100); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'easy',
+    stem: 'What is the maximum value of x(10 - x)?',
+    answer: '25',
+    solution: `This is a downward parabola with roots 0 and 10, so the vertex sits at the midpoint x = 5.\n\nValue = 5 x 5 = **25**.`,
+    verify: () => { let m = -Infinity; for (let x = -20; x <= 30; x += 0.001) m = Math.max(m, x * (10 - x)); return r(Math.round(m * 1000) / 1000); },
+  },
+  {
+    topic: 'maxima-minima', type: 'TITA', difficulty: 'medium',
+    stem: 'What is the minimum value of 2x² - 8x + 3?',
+    answer: '-5',
+    solution: `Vertex at x = -b/2a = 8/4 = 2.\n\nValue = 2(4) - 16 + 3 = 8 - 16 + 3 = **-5**.`,
+    verify: () => { let m = Infinity; for (let x = -20; x <= 20; x += 0.001) m = Math.min(m, 2 * x * x - 8 * x + 3); return r(Math.round(m * 1000) / 1000); },
+  },
+  {
+    topic: 'maxima-minima', type: 'MCQ', difficulty: 'hard',
+    stem: 'If a + b = 12, what is the minimum value of a² + b²?',
+    options: ['64', '72', '80', '144'],
+    answer: '72',
+    solution: `a^2 + b^2 = (a + b)^2 - 2ab = 144 - 2ab.\n\nTo **minimise** this we must **maximise** ab, which for a fixed sum happens at a = b = 6, giving ab = 36.\n\nMinimum = 144 - 72 = **72**.`,
+    verify: () => { let m = Infinity; for (let a = -50; a <= 50; a += 0.01) { const b = 12 - a; m = Math.min(m, a * a + b * b); } return String(Math.round(m)); },
+  },
+];
