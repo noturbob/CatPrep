@@ -100,8 +100,9 @@ scripts/          seeding and tests
 
 ## Status
 
-Working: daily practice loop, tracker, error log, question ingest, mock engine.
+Working: daily practice loop, tracker, error log, question ingest, mock engine,
+topic drill, bank browser.
 
-Not built yet: topic drill, bank browser, and the IIM mail dashboard (its
-classification rules and the 21 IIM domains are written and tested; the Gmail
-OAuth, sync route and cron job are not wired).
+Not built yet: the IIM mail dashboard (its classification rules and the 21 IIM
+domains are written and tested; the Gmail OAuth, sync route and cron job are
+not wired).
