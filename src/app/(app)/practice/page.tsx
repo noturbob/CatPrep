@@ -45,6 +45,7 @@ export default async function PracticePage() {
     errorTag: r.attempt.errorTag,
   }));
 
-  const title = `Daily practice · Day ${plan?.dayNum ?? '?'} · ${plan?.phaseLabel ?? ''}`;
+  const phase = plan?.phaseLabel?.replace(/^Phase \w+ · /, '') ?? '';
+  const title = `Day ${plan?.dayNum ?? '?'}${phase ? `, ${phase}` : ''}`;
   return <QuestionPlayer items={items} title={title} />;
 }

@@ -15,6 +15,10 @@ Ans: 7
 Difficulty: easy
 Sol: 2x = 14, so x = 7.`;
 
+const fieldCls =
+  'mt-1 w-full rounded-[2px] border border-border bg-panel-2 px-2.5 py-1.5 text-[13px] text-fg placeholder:text-faint focus:border-accent focus:outline-none';
+const labelCls = 'text-[12px] text-muted';
+
 export function IngestForm({
   qaTopics, dilrTopics,
 }: {
@@ -47,7 +51,7 @@ export function IngestForm({
       setMsg({
         ok: true,
         text: `Staged ${r.staged} question${r.staged === 1 ? '' : 's'}`
-          + (r.contexts ? ` and ${r.contexts} passage/set${r.contexts === 1 ? '' : 's'}` : '')
+          + (r.contexts ? ` and ${r.contexts} passage or set${r.contexts === 1 ? '' : 's'}` : '')
           + `. ${r.withWarnings} need${r.withWarnings === 1 ? 's' : ''} a look before approval.`,
       });
       setRaw(''); setPreview(null);
@@ -57,65 +61,53 @@ export function IngestForm({
   const warned = preview?.questions.filter((q) => q.warnings.length > 0).length ?? 0;
 
   return (
-    <div className="space-y-3">
-      <div className="grid gap-2 sm:grid-cols-3">
-        <label className="text-[11px] text-muted">
+    <div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label className={labelCls}>
           Batch label
           <input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            placeholder="CAT 2023 Slot 1 · Arithmetic"
-            className="mt-1 w-full rounded border border-border bg-panel-2 px-2 py-1.5 text-[12px] text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+            value={label} onChange={(e) => setLabel(e.target.value)}
+            placeholder="CAT 2023, Slot 1, Arithmetic"
+            className={fieldCls}
           />
         </label>
-        <label className="text-[11px] text-muted">
-          Topic for standalone QA questions
-          <select
-            value={qaTopic}
-            onChange={(e) => setQaTopic(e.target.value)}
-            className="mt-1 w-full rounded border border-border bg-panel-2 px-2 py-1.5 text-[12px] text-fg focus:border-accent focus:outline-none"
-          >
+        <label className={labelCls}>
+          Topic for standalone quant questions
+          <select value={qaTopic} onChange={(e) => setQaTopic(e.target.value)} className={fieldCls}>
             {qaTopics.map((t) => <option key={t.slug} value={t.slug}>{t.name}</option>)}
           </select>
         </label>
-        <label className="text-[11px] text-muted">
-          Topic for DILR sets
-          <select
-            value={dilrTopic}
-            onChange={(e) => setDilrTopic(e.target.value)}
-            className="mt-1 w-full rounded border border-border bg-panel-2 px-2 py-1.5 text-[12px] text-fg focus:border-accent focus:outline-none"
-          >
+        <label className={labelCls}>
+          Topic for data-and-logic sets
+          <select value={dilrTopic} onChange={(e) => setDilrTopic(e.target.value)} className={fieldCls}>
             {dilrTopics.map((t) => <option key={t.slug} value={t.slug}>{t.name}</option>)}
           </select>
         </label>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3">
-        <label className="text-[11px] text-muted">
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <label className={labelCls}>
           Source
           <select
-            value={source}
-            onChange={(e) => setSource(e.target.value as 'pyq' | 'imported')}
-            className="mt-1 w-full rounded border border-border bg-panel-2 px-2 py-1.5 text-[12px] text-fg focus:border-accent focus:outline-none"
+            value={source} onChange={(e) => setSource(e.target.value as 'pyq' | 'imported')}
+            className={fieldCls}
           >
             <option value="pyq">Real previous-year paper</option>
-            <option value="imported">Other material (coaching, book)</option>
+            <option value="imported">Other material — coaching, book</option>
           </select>
         </label>
-        <label className="text-[11px] text-muted">
-          Year <span className="text-faint">(optional)</span>
+        <label className={labelCls}>
+          Year <span className="text-faint">— optional</span>
           <input
             value={year} onChange={(e) => setYear(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
-            inputMode="numeric" placeholder="2023"
-            className="nums mt-1 w-full rounded border border-border bg-panel-2 px-2 py-1.5 text-[12px] text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+            inputMode="numeric" placeholder="2023" className={cn(fieldCls, 'nums')}
           />
         </label>
-        <label className="text-[11px] text-muted">
-          Slot <span className="text-faint">(optional)</span>
+        <label className={labelCls}>
+          Slot <span className="text-faint">— optional</span>
           <input
             value={slot} onChange={(e) => setSlot(e.target.value.slice(0, 20))}
-            placeholder="Slot 1"
-            className="mt-1 w-full rounded border border-border bg-panel-2 px-2 py-1.5 text-[12px] text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+            placeholder="Slot 1" className={fieldCls}
           />
         </label>
       </div>
@@ -127,84 +119,72 @@ export function IngestForm({
         spellCheck={false}
         placeholder={SAMPLE}
         aria-label="Paste questions"
-        className="w-full rounded border border-border bg-panel-2 px-3 py-2 font-mono text-[12px] leading-relaxed text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+        className="mt-3 w-full rounded-[2px] border border-border bg-panel-2 px-3 py-2.5 font-mono text-[12px] leading-relaxed text-fg placeholder:text-faint focus:border-accent focus:outline-none"
       />
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           type="button" onClick={doPreview} disabled={!raw.trim() || pending}
-          className="rounded border border-border px-3 py-1.5 text-[12px] text-fg hover:border-border-hi disabled:opacity-40"
+          className="rounded-[2px] border border-border px-3.5 py-1.5 text-[13px] text-fg transition-colors hover:border-border-hi disabled:opacity-40"
         >
           {pending ? 'Working…' : 'Parse preview'}
         </button>
         <button
           type="button" onClick={doImport} disabled={!preview || preview.questions.length === 0 || pending}
-          className="rounded bg-accent px-3 py-1.5 text-[12px] font-medium text-bg hover:opacity-90 disabled:opacity-40"
+          className="rounded-[2px] bg-accent px-3.5 py-1.5 text-[13px] font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           Import {preview?.questions.length ?? 0} to staging
         </button>
         <button
           type="button" onClick={() => { setRaw(SAMPLE); setPreview(null); }}
-          className="text-[11px] text-faint underline underline-offset-2 hover:text-muted"
+          className="text-[12px] text-faint underline decoration-faint/50 underline-offset-2 hover:text-muted"
         >
           load a sample
         </button>
       </div>
 
       {msg && (
-        <p role="status" className={cn('rounded border px-3 py-2 text-[12px]',
-          msg.ok ? 'border-ok/40 bg-ok/10 text-ok' : 'border-bad/40 bg-bad/10 text-bad')}>
+        <p role="status" className={cn('settle mt-3 text-[13px]', msg.ok ? 'text-ok' : 'text-bad')}>
           {msg.text}
         </p>
       )}
 
       {preview && (
-        <div className="rounded border border-border bg-panel p-3">
-          <p className="text-[12px]">
-            <span className="nums text-fg">{preview.questions.length}</span>
-            <span className="text-muted"> question{preview.questions.length === 1 ? '' : 's'}</span>
+        <div className="settle mt-4 border-t border-border pt-4">
+          <p className="text-[13px] text-fg">
+            {preview.questions.length} question{preview.questions.length === 1 ? '' : 's'}
             {preview.contexts.length > 0 && (
-              <>
-                <span className="text-faint"> · </span>
-                <span className="nums text-fg">{preview.contexts.length}</span>
-                <span className="text-muted"> passage/set{preview.contexts.length === 1 ? '' : 's'}</span>
-              </>
+              <span className="text-muted">
+                , {preview.contexts.length} passage or set{preview.contexts.length === 1 ? '' : 's'}
+              </span>
             )}
-            {warned > 0 && (
-              <>
-                <span className="text-faint"> · </span>
-                <span className="nums text-bad">{warned}</span>
-                <span className="text-muted"> with warnings</span>
-              </>
-            )}
+            {warned > 0 && <span className="text-bad">, {warned} with warnings</span>}
           </p>
 
-          <ul className="mt-3 max-h-80 space-y-2 overflow-y-auto">
+          <ul className="mt-3 max-h-80 divide-y divide-border overflow-y-auto border-y border-border">
             {preview.questions.map((q, i) => (
-              <li key={i} className="rounded border border-border bg-panel-2 px-3 py-2">
-                <div className="flex flex-wrap items-center gap-2 text-[10px] text-faint">
-                  <span>{q.type}</span><span>·</span><span>{q.difficulty}</span>
+              <li key={i} className="py-2.5 text-[12px]">
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-faint">
+                  <span>{q.type}</span>
+                  <span>{q.difficulty}</span>
                   {q.contextIdx !== null && (
-                    <>
-                      <span>·</span>
-                      <span className="text-varc">
-                        {preview.contexts[q.contextIdx].kind === 'rc_passage' ? 'RC' : 'DILR'} set {q.contextIdx + 1}
-                      </span>
-                    </>
+                    <span className="text-varc">
+                      {preview.contexts[q.contextIdx].kind === 'rc_passage' ? 'reading' : 'data & logic'} set {q.contextIdx + 1}
+                    </span>
                   )}
                 </div>
-                <p className="mt-1 text-[12px] text-fg">{q.stem.slice(0, 160)}{q.stem.length > 160 ? '…' : ''}</p>
+                <p className="mt-1 text-fg">{q.stem.slice(0, 160)}{q.stem.length > 160 ? '…' : ''}</p>
                 {q.options && (
-                  <p className="mt-1 text-[11px] text-muted">{q.options.join('  ·  ')}</p>
+                  <p className="mt-1 text-muted">{q.options.join('   ')}</p>
                 )}
-                <p className="mt-1 text-[11px]">
+                <p className="mt-1">
                   <span className="text-faint">answer </span>
                   <span className="nums text-ok">{q.answer ?? '—'}</span>
-                  <span className="text-faint"> · solution </span>
-                  <span className={q.solution ? 'text-ok' : 'text-bad'}>{q.solution ? 'yes' : 'missing'}</span>
+                  <span className="text-faint">  solution </span>
+                  <span className={q.solution ? 'text-ok' : 'text-bad'}>{q.solution ? 'present' : 'missing'}</span>
                 </p>
                 {q.warnings.length > 0 && (
-                  <p className="mt-1 text-[11px] text-bad">{q.warnings.join(' · ')}</p>
+                  <p className="mt-1 text-bad">{q.warnings.join(', ')}</p>
                 )}
               </li>
             ))}

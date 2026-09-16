@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getRunState, computeScore } from '@/lib/mock';
-import { StatTile } from '@/components/charts';
+import { Figure, Range } from '@/components/charts';
 import { fmtDuration, cn } from '@/lib/utils';
 import { scoreForPercentile } from '@/data/percentiles';
 
@@ -22,77 +22,76 @@ export default async function MockAnalysisPage({ params }: PageProps<'/mock/[id]
   const qaTargetRaw = scoreForPercentile('QA', 95);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-6">
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+    <main className="mx-auto w-full max-w-4xl px-5 pb-16 pt-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[13px] font-semibold">{state.mockName}</h1>
-          <p className="mt-0.5 text-[12px] text-muted">
+          <h1 className="text-[19px] font-normal text-fg">{state.mockName}</h1>
+          <p className="mt-1.5 text-[12px] text-muted">
             Submitted {new Date(state.submittedAt).toLocaleString('en-GB')}
           </p>
         </div>
-        <Link href="/mock" className="text-[12px] text-accent underline underline-offset-2">
+        <Link href="/mock" className="text-[13px] text-accent underline decoration-accent/40 underline-offset-2">
           All mocks
         </Link>
       </div>
 
-      <section className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile label="Total marks" value={String(s.total)} sub={`~${s.totalPercentile}%ile (estimate)`} tone="accent" />
-        <StatTile label="Time used" value={fmtDuration(s.timeMs)} />
-        <StatTile
-          label="Time on wrong answers" value={`${wrongPct}%`}
-          sub="the marks you paid twice for" tone={wrongPct > 35 ? 'bad' : 'default'}
-        />
+      <section className="grid grid-cols-2 gap-x-8 gap-y-6 border-y border-border py-7 sm:grid-cols-4">
+        <Figure label="Total marks" value={String(s.total)}
+          against={`around the ${s.totalPercentile}th percentile`} tone="signal" size="lg" />
+        <Figure label="Time used" value={fmtDuration(s.timeMs)} against="across every section" size="lg" />
+        <Figure label="Spent on wrong answers" value={`${wrongPct}%`}
+          against="the marks you paid for twice" tone={wrongPct > 35 ? 'bad' : 'neutral'} size="lg" />
         {qa && (
-          <StatTile
-            label="QA attemptable accuracy" value={`${qa.attemptableAccuracy}%`}
-            sub={`${qa.inScopeCorrect}/${qa.inScopeAttempted} in-scope`}
-            tone={qa.attemptableAccuracy >= 70 ? 'ok' : 'bad'}
-          />
+          <Figure label="Quant, questions you meant to attempt" value={`${qa.attemptableAccuracy}%`}
+            against={`${qa.inScopeCorrect} of ${qa.inScopeAttempted} in scope`}
+            tone={qa.inScopeAttempted === 0 ? 'neutral' : qa.attemptableAccuracy >= 70 ? 'ok' : 'bad'} size="lg" />
         )}
       </section>
 
       {!s.calibration.realistic && (
-        <section className="mb-5 rounded border border-accent/40 bg-accent/5 p-4">
-          <h2 className="text-[12px] font-semibold text-accent">Read this score with a pinch of salt</h2>
-          <ul className="mt-2 space-y-1.5 text-[11px] text-muted">
+        <section className="border-b border-border py-7">
+          <h2 className="text-[13px] text-accent">This score flatters you</h2>
+          <ul className="mt-3 max-w-[66ch] divide-y divide-border border-y border-border">
             {s.calibration.notes.map((n) => (
-              <li key={n} className="flex gap-2">
-                <span className="text-accent">—</span><span>{n}</span>
-              </li>
+              <li key={n} className="py-2.5 text-[12px] leading-relaxed text-muted">{n}</li>
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-faint">
-            The percentile above is therefore optimistic. It becomes trustworthy once real past
-            papers are imported at <span className="text-muted">/admin/ingest</span>.
+          <p className="mt-3 max-w-[66ch] text-[12px] leading-relaxed text-faint">
+            Treat the percentile above as optimistic. It becomes trustworthy once real past
+            papers are in the bank.
           </p>
         </section>
       )}
 
       {/* ------------------------------------------------- per section */}
-      <section className="mb-5 space-y-3">
+      <section>
         {s.sections.map((sec) => {
           const max = SECTION_MAX[sec.section as keyof typeof SECTION_MAX] ?? 66;
           return (
-            <div key={sec.section} className="rounded border border-border bg-panel p-4">
-              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-[12px] font-semibold">{sec.section}</h2>
-                <p className="text-[12px]">
-                  <span className="nums text-accent">{sec.score}</span>
-                  <span className="text-faint"> / {max} · ~</span>
-                  <span className="nums text-fg">{s.sectionPercentiles[sec.section]}</span>
-                  <span className="text-faint">%ile</span>
-                </p>
-              </div>
+            <div key={sec.section} className="border-b border-border py-7">
+              <Range
+                label={sec.section === 'QA' ? 'Quant' : sec.section === 'DILR' ? 'Data and logic' : 'Reading and verbal'}
+                value={sec.score} max={max}
+                target={sec.section === 'QA' ? qaTargetRaw : undefined}
+                fill={`var(--color-${sec.section.toLowerCase()})`}
+                valueLabel={`${sec.score}`}
+                meta={`raw marks out of ${max}, around the ${s.sectionPercentiles[sec.section]}th percentile`}
+                targetLabel={sec.section === 'QA' ? `${qaTargetRaw} for 95th` : undefined}
+              />
 
-              <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px] sm:grid-cols-4">
-                <div><dt className="text-faint">Correct</dt><dd className="nums text-ok">{sec.correct}</dd></div>
-                <div><dt className="text-faint">Wrong</dt><dd className="nums text-bad">{sec.wrong}</dd></div>
-                <div><dt className="text-faint">Skipped</dt><dd className="nums text-muted">{sec.skipped}</dd></div>
-                <div><dt className="text-faint">Accuracy</dt><dd className="nums text-fg">{sec.accuracy}%</dd></div>
+              <dl className="mt-4 grid grid-cols-2 gap-x-8 gap-y-2 text-[12px] sm:grid-cols-4">
+                <div className="flex justify-between sm:block">
+                  <dt className="text-faint">Correct</dt><dd className="nums mt-0.5 text-ok">{sec.correct}</dd></div>
+                <div className="flex justify-between sm:block">
+                  <dt className="text-faint">Wrong</dt><dd className="nums mt-0.5 text-bad">{sec.wrong}</dd></div>
+                <div className="flex justify-between sm:block">
+                  <dt className="text-faint">Left blank</dt><dd className="nums mt-0.5 text-muted">{sec.skipped}</dd></div>
+                <div className="flex justify-between sm:block">
+                  <dt className="text-faint">Accuracy</dt><dd className="nums mt-0.5 text-fg">{sec.accuracy}%</dd></div>
               </dl>
 
               {sec.outOfScopeSkipped > 0 && (
-                <p className="mt-3 rounded border border-border bg-panel-2 px-3 py-2 text-[11px] text-muted">
+                <p className="mt-4 max-w-[64ch] text-[12px] leading-relaxed text-muted">
                   <span className="nums text-fg">{sec.outOfScopeSkipped}</span> of those skips were
                   out-of-scope questions (Geometry, Number System, Modern Math) — skipped by design,
                   not missed. Your real number here is the{' '}
@@ -102,7 +101,7 @@ export default async function MockAnalysisPage({ params }: PageProps<'/mock/[id]
               )}
 
               {sec.section === 'QA' && (
-                <p className={cn('mt-2 text-[11px]',
+                <p className={cn('mt-3 text-[12px]',
                   sec.score >= qaTargetRaw ? 'text-ok' : 'text-muted')}>
                   {sec.score >= qaTargetRaw
                     ? `Above the ${qaTargetRaw} raw needed for a 95%ile QA sectional.`
@@ -116,16 +115,16 @@ export default async function MockAnalysisPage({ params }: PageProps<'/mock/[id]
 
       {/* ------------------------------------------------- time sinks */}
       {s.slowest.length > 0 && (
-        <section className="mb-5 rounded border border-border bg-panel p-4">
-          <h2 className="text-[12px] font-semibold">Slowest questions</h2>
-          <p className="mb-3 mt-0.5 text-[11px] text-muted">
+        <section className="border-b border-border py-7">
+          <h2 className="text-[13px] text-fg">Where the time went</h2>
+          <p className="mb-4 mt-1 max-w-[62ch] text-[12px] leading-relaxed text-muted">
             A slow question you got wrong is the worst outcome in a timed paper — that is where
             the section is actually lost.
           </p>
           <ul className="divide-y divide-border">
             {s.slowest.map((q, i) => (
               <li key={i} className="flex items-start gap-3 py-2">
-                <span className={cn('nums shrink-0 rounded px-1.5 py-0.5 text-[11px]',
+                <span className={cn('nums shrink-0 rounded-[2px] px-1.5 py-0.5 text-[11px]',
                   q.status === 'correct' && 'bg-ok/15 text-ok',
                   q.status === 'wrong' && 'bg-bad/15 text-bad',
                   q.status !== 'correct' && q.status !== 'wrong' && 'bg-panel-2 text-muted')}>
@@ -140,9 +139,9 @@ export default async function MockAnalysisPage({ params }: PageProps<'/mock/[id]
         </section>
       )}
 
-      <p className="text-[12px] text-muted">
+      <p className="py-7 text-[13px] leading-relaxed text-muted">
         Every wrong answer from this mock is already in your{' '}
-        <Link href="/errors" className="text-accent underline underline-offset-2">error log</Link>.
+        <Link href="/errors" className="text-accent underline decoration-accent/40 underline-offset-2">mistakes page</Link>.
         Analyse it today, not tomorrow.
       </p>
     </main>

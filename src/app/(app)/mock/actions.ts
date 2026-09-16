@@ -17,9 +17,9 @@ export async function createMock(kind: 'full' | 'qa' | 'custom', custom?: Bluepr
     : custom ?? { ...QA_SECTIONAL };
 
   const stamp = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-  const name = kind === 'full' ? `Full mock · ${stamp}`
-    : kind === 'qa' ? `QA sectional · ${stamp}`
-    : `Custom mock · ${stamp}`;
+  const name = kind === 'full' ? `Full mock, ${stamp}`
+    : kind === 'qa' ? `Quant sectional, ${stamp}`
+    : `Custom mock, ${stamp}`;
 
   const report = await assembleMock(name, blueprint);
   revalidatePath('/mock');

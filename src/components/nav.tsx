@@ -5,42 +5,47 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const LINKS = [
-  { href: '/', label: 'Dashboard' },
+  { href: '/', label: 'Today' },
   { href: '/practice', label: 'Practice' },
   { href: '/drill', label: 'Drill' },
   { href: '/bank', label: 'Bank' },
   { href: '/mock', label: 'Mocks' },
-  { href: '/tracker', label: 'Tracker' },
-  { href: '/errors', label: 'Errors' },
+  { href: '/tracker', label: 'Progress' },
+  { href: '/errors', label: 'Mistakes' },
   { href: '/mail', label: 'Inbox' },
 ];
 
 export function Nav({ daysLeft }: { daysLeft: number }) {
   const path = usePathname();
   return (
-    <nav className="sticky top-0 z-30 border-b border-border bg-bg/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-1 overflow-x-auto px-4 py-2">
-        <Link href="/" className="mr-2 shrink-0 text-[13px] font-semibold tracking-tight">
-          catprep
+    <nav className="sticky top-0 z-30 border-b border-border bg-bg/95 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-4xl items-center gap-5 overflow-x-auto px-5 py-3">
+        <Link href="/" className="shrink-0 text-[13px] font-medium tracking-tight text-fg">
+          CatPrep
         </Link>
-        {LINKS.map((l) => {
-          const active = l.href === '/' ? path === '/' : path.startsWith(l.href);
-          return (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={cn(
-                'shrink-0 rounded px-2.5 py-1 text-[12px] transition-colors',
-                active ? 'bg-panel-2 text-fg' : 'text-muted hover:text-fg',
-              )}
-            >
-              {l.label}
-            </Link>
-          );
-        })}
-        <span className="nums ml-auto shrink-0 pl-3 text-[12px] text-muted">
-          <span className="text-accent">{daysLeft}</span>
-          <span className="text-faint"> days left</span>
+        <ul className="flex items-center gap-4">
+          {LINKS.map((l) => {
+            const active = l.href === '/' ? path === '/' : path.startsWith(l.href);
+            return (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={cn(
+                    'block shrink-0 border-b py-0.5 text-[13px] transition-colors',
+                    active
+                      ? 'border-accent text-fg'
+                      : 'border-transparent text-faint hover:text-muted',
+                  )}
+                >
+                  {l.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <span className="nums ml-auto shrink-0 text-[12px] text-faint">
+          {daysLeft}d
         </span>
       </div>
     </nav>

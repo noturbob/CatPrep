@@ -30,16 +30,16 @@ export type PlayerItem = {
 
 type Result = { status: AttemptStatus; correct: boolean; answer: string; solution: string };
 
+const SECTION_LABEL: Record<Section, string> = { QA: 'Quant', DILR: 'Data & logic', VARC: 'Reading' };
 const SECTION_COLOR: Record<Section, string> = {
-  QA: 'text-qa', DILR: 'text-dilr', VARC: 'text-varc',
+  QA: 'var(--color-qa)', DILR: 'var(--color-dilr)', VARC: 'var(--color-varc)',
 };
 
 const ERROR_TAGS: { tag: ErrorTag; label: string; hint: string }[] = [
-  { tag: 'conceptual', label: 'Concept', hint: "Didn't know the method" },
-  { tag: 'calculation', label: 'Calculation', hint: 'Right method, arithmetic slip' },
-  { tag: 'misread', label: 'Misread', hint: 'Misread the question' },
-  { tag: 'timeout', label: 'Too slow', hint: 'Knew it, ran out of time' },
-  { tag: 'guess', label: 'Guess', hint: 'Got it right by luck' },
+  { tag: 'conceptual', label: "Didn't know the method", hint: "Didn't know the method" },
+  { tag: 'calculation', label: 'Arithmetic slip', hint: 'Right method, arithmetic slip' },
+  { tag: 'misread', label: 'Misread it', hint: 'Misread the question' },
+  { tag: 'timeout', label: 'Ran out of time', hint: 'Knew it, ran out of time' },
 ];
 
 /** Target seconds per question, for the pace indicator. */
@@ -150,64 +150,62 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
   const overPace = liveMs / 1000 > PACE_TARGET[item.section];
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-5">
+    <div className="mx-auto w-full max-w-4xl px-5 pb-16 pt-8">
       {/* ---------------------------------------------------------- header */}
-      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
         <div>
-          <h1 className="text-[13px] font-semibold">{title}</h1>
-          <p className="mt-0.5 text-[12px] text-muted">
-            <span className="nums">{done}</span>/<span className="nums">{items.length}</span> done
+          <h1 className="text-[19px] font-normal text-fg">{title}</h1>
+          <p className="mt-1.5 text-[13px] text-muted">
+            <span className="nums text-fg">{done}</span>
+            <span className="text-faint">/{items.length} done</span>
             {done > 0 && (
-              <> · <span className="nums text-ok">{correct}</span> correct
-                {' '}(<span className="nums">{Math.round((correct / done) * 100)}%</span>)</>
+              <span className="text-faint">
+                {'  '}
+                <span className="nums text-ok">{correct}</span> correct,{' '}
+                <span className="nums">{Math.round((correct / done) * 100)}%</span>
+              </span>
             )}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={cn('nums rounded border px-2 py-1 text-[12px]',
-            overPace ? 'border-bad/40 bg-bad/10 text-bad' : 'border-border bg-panel text-muted')}>
+        <div className="flex items-center gap-3">
+          <span className={cn('nums text-[13px]', overPace ? 'text-bad' : 'text-muted')}>
             {fmtDuration(liveMs)}
-            <span className="ml-1 text-faint">/ {PACE_TARGET[item.section]}s</span>
+            <span className="text-faint"> / {PACE_TARGET[item.section]}s</span>
           </span>
           <button
             type="button"
             onClick={() => setShowCalc((s) => !s)}
-            className="rounded border border-border bg-panel px-2.5 py-1 text-[12px] text-fg hover:border-border-hi"
+            className="rounded-[2px] border border-border px-3 py-1.5 text-[13px] text-fg transition-colors hover:border-border-hi"
           >
-            {showCalc ? 'Hide' : 'Calculator'}
+            {showCalc ? 'Hide calculator' : 'Calculator'}
           </button>
         </div>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_180px]">
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_180px]">
         {/* ------------------------------------------------------- question */}
         <div className="min-w-0">
           {item.contextBody && (
-            <div className="mb-3 max-h-72 overflow-y-auto rounded border border-border bg-panel p-4">
+            <div className="mb-4 max-h-72 overflow-y-auto border-b border-border pb-4">
               {item.contextTitle && (
-                <h2 className="mb-2 text-[12px] font-semibold text-muted">{item.contextTitle}</h2>
+                <h2 className="mb-2 text-[12px] text-muted">{item.contextTitle}</h2>
               )}
               <Markdown className="prose-cat text-[13px] text-fg">{item.contextBody}</Markdown>
             </div>
           )}
 
-          <div className="rounded border border-border bg-panel p-4">
-            <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px]">
-              <span className={cn('font-semibold', SECTION_COLOR[item.section])}>{item.section}</span>
-              <span className="text-faint">·</span>
+          <div>
+            <div className="mb-3 flex flex-wrap items-center gap-3 text-[12px] text-faint">
+              <span style={{ color: SECTION_COLOR[item.section] }}>{SECTION_LABEL[item.section]}</span>
               <span className="text-muted">{item.topicName}</span>
-              <span className="text-faint">·</span>
-              <span className="text-faint">{item.difficulty}</span>
-              <span className="text-faint">·</span>
-              <span className="text-faint">
-                {item.type}{item.type === 'MCQ' ? ' (−1 if wrong)' : ' (no negative)'}
-              </span>
+              <span>{item.difficulty}</span>
+              <span>{item.type === 'MCQ' ? '−1 if wrong' : 'no negative marking'}</span>
             </div>
 
-            <Markdown className="prose-cat text-[14px] leading-relaxed">{item.stem}</Markdown>
+            <Markdown className="prose-cat text-[15px] leading-relaxed text-fg">{item.stem}</Markdown>
 
             {/* ------------------------------------------------ answer area */}
-            <div className="mt-4">
+            <div className="mt-5">
               {item.options ? (
                 <div className="space-y-1.5">
                   {item.options.map((opt, i) => {
@@ -221,43 +219,43 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
                         disabled={answered}
                         onClick={() => setDraft((d) => ({ ...d, [item.attemptId]: opt }))}
                         className={cn(
-                          'flex w-full items-start gap-2.5 rounded border px-3 py-2 text-left text-[13px] transition-colors',
+                          'flex w-full items-start gap-3 rounded-[2px] border px-3 py-2.5 text-left text-[13px] transition-colors',
                           'disabled:cursor-default',
                           !answered && picked && 'border-accent bg-accent/10',
                           !answered && !picked && 'border-border bg-panel-2 hover:border-border-hi',
                           isAnswer && 'border-ok bg-ok/10',
                           isWrongPick && 'border-bad bg-bad/10',
-                          answered && !isAnswer && !isWrongPick && 'border-border bg-panel-2 opacity-60',
+                          answered && !isAnswer && !isWrongPick && 'border-border bg-panel-2 opacity-50',
                         )}
                       >
                         <span className="nums mt-px text-[11px] text-faint">{i + 1}</span>
-                        <span className="flex-1">{opt}</span>
-                        {isAnswer && <span className="text-[11px] font-semibold text-ok">correct</span>}
-                        {isWrongPick && <span className="text-[11px] font-semibold text-bad">your answer</span>}
+                        <span className="flex-1 text-fg">{opt}</span>
+                        {isAnswer && <span className="text-[11px] text-ok">correct</span>}
+                        {isWrongPick && <span className="text-[11px] text-bad">your answer</span>}
                       </button>
                     );
                   })}
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <input
                     type="text"
                     inputMode="decimal"
                     disabled={answered}
                     value={value}
                     onChange={(e) => setDraft((d) => ({ ...d, [item.attemptId]: e.target.value }))}
-                    placeholder="type your answer"
+                    placeholder="Your answer"
                     aria-label="Your answer"
                     className={cn(
-                      'nums w-48 rounded border bg-panel-2 px-3 py-2 text-[14px] text-fg placeholder:text-faint focus:outline-none',
+                      'nums w-48 rounded-[2px] border bg-panel-2 px-3 py-2 text-[14px] text-fg placeholder:text-faint focus:outline-none',
                       result && result.correct && 'border-ok',
                       result && !result.correct && 'border-bad',
                       !result && 'border-border focus:border-accent',
                     )}
                   />
                   {result && !result.correct && (
-                    <span className="text-[12px] text-muted">
-                      answer: <span className="nums font-semibold text-ok">{result.answer}</span>
+                    <span className="text-[13px] text-muted">
+                      correct answer <span className="nums text-ok">{result.answer}</span>
                     </span>
                   )}
                 </div>
@@ -265,14 +263,14 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
             </div>
 
             {/* --------------------------------------------------- controls */}
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               {!answered ? (
                 <>
                   <button
                     type="button"
                     onClick={submit}
                     disabled={pending}
-                    className="rounded bg-accent px-3.5 py-1.5 text-[13px] font-medium text-bg hover:opacity-90 disabled:opacity-50"
+                    className="rounded-[2px] bg-accent px-3.5 py-1.5 text-[13px] font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-50"
                   >
                     {pending ? 'Saving…' : 'Submit'}
                   </button>
@@ -280,7 +278,7 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
                     type="button"
                     onClick={() => { setDraft((d) => ({ ...d, [item.attemptId]: '' })); submit(); }}
                     disabled={pending}
-                    className="rounded border border-border px-3 py-1.5 text-[13px] text-muted hover:border-border-hi"
+                    className="text-[13px] text-faint underline decoration-faint/50 underline-offset-2 hover:text-muted"
                   >
                     Skip
                   </button>
@@ -290,9 +288,9 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
                   type="button"
                   onClick={() => goto(idx + 1)}
                   disabled={idx >= items.length - 1}
-                  className="rounded bg-accent px-3.5 py-1.5 text-[13px] font-medium text-bg hover:opacity-90 disabled:opacity-40"
+                  className="rounded-[2px] bg-accent px-3.5 py-1.5 text-[13px] font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-40"
                 >
-                  Next →
+                  Next
                 </button>
               )}
               <button
@@ -302,48 +300,49 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
                   setItems((l) => l.map((it) => it.attemptId === item.attemptId ? { ...it, markedForReview: next } : it));
                   toggleMarked(item.attemptId, next);
                 }}
-                className={cn('rounded border px-3 py-1.5 text-[13px]',
+                className={cn('rounded-[2px] border px-3 py-1.5 text-[13px] transition-colors',
                   item.markedForReview ? 'border-varc text-varc' : 'border-border text-muted hover:border-border-hi')}
               >
-                {item.markedForReview ? 'Marked' : 'Mark'}
+                {item.markedForReview ? 'Marked' : 'Mark for review'}
               </button>
-              <span className="ml-auto text-[11px] text-faint">
-                Enter to submit · ←/→ to move{item.options ? ' · 1-4 to pick' : ''}
+              <span className="ml-auto hidden text-[11px] text-faint sm:block">
+                Enter to submit, arrows to move{item.options ? ', 1–4 to pick' : ''}
               </span>
             </div>
           </div>
 
           {/* ------------------------------------------------ after answering */}
           {result && (
-            <div className="mt-3 rounded border border-border bg-panel p-4">
-              <div className="mb-3 flex items-center gap-2">
-                <span className={cn('rounded px-2 py-0.5 text-[11px] font-semibold',
-                  result.status === 'correct' && 'bg-ok/15 text-ok',
-                  result.status === 'wrong' && 'bg-bad/15 text-bad',
-                  result.status === 'skipped' && 'bg-panel-2 text-muted')}>
+            <div className="settle mt-6 border-t border-border pt-5">
+              <div className="mb-3 flex items-center gap-3">
+                <span className={cn('text-[13px] font-medium',
+                  result.status === 'correct' && 'text-ok',
+                  result.status === 'wrong' && 'text-bad',
+                  result.status === 'skipped' && 'text-muted')}>
                   {result.status === 'correct' ? 'Correct' : result.status === 'wrong' ? 'Wrong' : 'Skipped'}
                 </span>
-                <span className="nums text-[11px] text-faint">{fmtDuration(item.timeMs)}</span>
+                <span className="nums text-[12px] text-faint">{fmtDuration(item.timeMs)}</span>
               </div>
 
               <Markdown className="prose-cat text-[13px] text-fg">{result.solution}</Markdown>
 
               {result.status !== 'correct' ? (
-                <div className="mt-4 border-t border-border pt-3">
-                  <p className="mb-2 text-[11px] text-muted">What went wrong? (one tap — this drives your error log)</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {ERROR_TAGS.filter((t) => t.tag !== 'guess').map((t) => (
+                <div className="mt-4 border-t border-border pt-4">
+                  <p className="mb-2 text-[12px] text-muted">
+                    What went wrong? One tap — this is what fills in your progress page.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {ERROR_TAGS.map((t) => (
                       <button
                         key={t.tag}
                         type="button"
-                        title={t.hint}
                         onClick={() => {
                           setItems((l) => l.map((it) => it.attemptId === item.attemptId ? { ...it, errorTag: t.tag } : it));
                           setErrorTag(item.attemptId, t.tag);
                         }}
-                        className={cn('rounded border px-2.5 py-1 text-[12px]',
+                        className={cn('rounded-[2px] border px-2.5 py-1 text-[12px] transition-colors',
                           item.errorTag === t.tag
-                            ? 'border-accent bg-accent/10 text-accent'
+                            ? 'border-accent text-accent'
                             : 'border-border text-muted hover:border-border-hi')}
                       >
                         {t.label}
@@ -352,22 +351,22 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 border-t border-border pt-3">
+                <div className="mt-4 border-t border-border pt-4">
                   <button
                     type="button"
                     onClick={() => {
                       setItems((l) => l.map((it) => it.attemptId === item.attemptId ? { ...it, errorTag: 'guess' } : it));
                       setErrorTag(item.attemptId, 'guess');
                     }}
-                    className={cn('rounded border px-2.5 py-1 text-[12px]',
+                    className={cn('rounded-[2px] border px-2.5 py-1 text-[12px] transition-colors',
                       item.errorTag === 'guess'
-                        ? 'border-accent bg-accent/10 text-accent'
+                        ? 'border-accent text-accent'
                         : 'border-border text-muted hover:border-border-hi')}
                   >
                     I guessed this
                   </button>
                   <span className="ml-2 text-[11px] text-faint">
-                    Marking a lucky guess keeps it in your revision queue.
+                    Keeps it in your revision queue even though it scored.
                   </span>
                 </div>
               )}
@@ -376,48 +375,42 @@ export function QuestionPlayer({ items: initial, title }: { items: PlayerItem[];
         </div>
 
         {/* -------------------------------------------------------- palette */}
-        <aside className="lg:sticky lg:top-4 lg:self-start">
-          <div className="rounded border border-border bg-panel p-3">
-            <p className="mb-2 text-[11px] font-semibold text-muted">Palette</p>
-            <div className="grid grid-cols-5 gap-1">
-              {items.map((it, i) => (
-                <button
-                  key={it.attemptId}
-                  type="button"
-                  onClick={() => goto(i)}
-                  aria-label={`Question ${i + 1}, ${it.status}`}
-                  className={cn(
-                    'nums relative h-7 rounded text-[11px] font-medium',
-                    i === idx && 'ring-2 ring-accent ring-offset-1 ring-offset-panel',
-                    it.status === 'correct' && 'bg-ok/20 text-ok',
-                    it.status === 'wrong' && 'bg-bad/20 text-bad',
-                    it.status === 'skipped' && 'bg-panel-2 text-faint',
-                    it.status === 'unseen' && 'bg-panel-2 text-muted',
-                  )}
-                >
-                  {i + 1}
-                  {it.markedForReview && (
-                    <span className="absolute right-0.5 top-0.5 h-1.5 w-1.5 rounded-full bg-varc" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <dl className="mt-3 space-y-1 border-t border-border pt-2 text-[11px]">
-              {([['Correct', 'correct', 'bg-ok/20'], ['Wrong', 'wrong', 'bg-bad/20'],
-                 ['Skipped', 'skipped', 'bg-panel-2'], ['Not seen', 'unseen', 'bg-panel-2']] as const).map(
-                ([label, key, cls]) => (
-                  <div key={key} className="flex items-center justify-between">
-                    <dt className="flex items-center gap-1.5 text-muted">
-                      <span className={cn('h-2.5 w-2.5 rounded-sm', cls)} />
-                      {label}
-                    </dt>
-                    <dd className="nums text-fg">{items.filter((i) => i.status === key).length}</dd>
-                  </div>
-                ),
-              )}
-            </dl>
+        <aside className="lg:sticky lg:top-16 lg:self-start">
+          <p className="mb-2 text-[11px] text-faint">This session</p>
+          <div className="grid grid-cols-5 gap-1">
+            {items.map((it, i) => (
+              <button
+                key={it.attemptId}
+                type="button"
+                onClick={() => goto(i)}
+                aria-label={`Question ${i + 1}, ${it.status}`}
+                aria-current={i === idx}
+                className={cn(
+                  'nums relative h-7 rounded-[2px] text-[11px] transition-colors',
+                  i === idx && 'ring-1 ring-accent',
+                  it.status === 'correct' && 'bg-ok/15 text-ok',
+                  it.status === 'wrong' && 'bg-bad/15 text-bad',
+                  it.status === 'skipped' && 'bg-panel-2 text-faint',
+                  it.status === 'unseen' && 'bg-panel-2 text-muted',
+                )}
+              >
+                {i + 1}
+                {it.markedForReview && (
+                  <span className="absolute right-0.5 top-0.5 h-1 w-1 rounded-full bg-varc" />
+                )}
+              </button>
+            ))}
           </div>
+
+          <dl className="mt-4 space-y-1.5 border-t border-border pt-3 text-[12px]">
+            {([['Correct', 'correct'], ['Wrong', 'wrong'],
+               ['Skipped', 'skipped'], ['Left', 'unseen']] as const).map(([label, key]) => (
+              <div key={key} className="flex items-center justify-between">
+                <dt className="text-faint">{label}</dt>
+                <dd className="nums text-fg">{items.filter((i) => i.status === key).length}</dd>
+              </div>
+            ))}
+          </dl>
         </aside>
       </div>
 

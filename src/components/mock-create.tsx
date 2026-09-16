@@ -23,64 +23,63 @@ export function MockCreate({ available }: { available: Record<Section, number> }
   const canFull = available.VARC > 0 && available.DILR > 0 && available.QA > 0;
 
   return (
-    <div className="rounded border border-border bg-panel p-4">
-      <h2 className="text-[12px] font-semibold">New mock</h2>
-      <p className="mb-3 mt-0.5 text-[11px] text-muted">
-        Assembled from verified questions in your bank. 40 minutes per section, fixed order,
-        no going back.
+    <section className="border-b border-border py-7">
+      <h2 className="text-[13px] text-fg">Start a mock</h2>
+      <p className="mb-4 mt-1 max-w-[58ch] text-[12px] leading-relaxed text-muted">
+        Assembled from verified questions in your bank. Forty minutes a section, fixed
+        order, no going back.
       </p>
 
       <div className="flex flex-wrap gap-2">
         <button
           type="button" onClick={() => make('qa')} disabled={pending || available.QA === 0}
-          className="rounded bg-accent px-3 py-1.5 text-[12px] font-medium text-bg hover:opacity-90 disabled:opacity-40"
+          className="rounded-[2px] bg-accent px-3.5 py-1.5 text-[13px] font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-40"
         >
-          QA sectional · 22 Q · 40 min
+          Quant sectional — 22 questions, 40 min
         </button>
         <button
           type="button" onClick={() => make('full')} disabled={pending || !canFull}
-          className="rounded border border-border px-3 py-1.5 text-[12px] text-fg hover:border-border-hi disabled:opacity-40"
+          className="rounded-[2px] border border-border px-3.5 py-1.5 text-[13px] text-fg transition-colors hover:border-border-hi disabled:opacity-40"
         >
-          Full mock · 68 Q · 120 min
+          Full mock — 68 questions, 120 min
         </button>
       </div>
 
       {!canFull && (
-        <p className="mt-3 rounded border border-border bg-panel-2 px-3 py-2 text-[11px] text-muted">
-          A full mock needs VARC and DILR content. Bank has{' '}
-          <span className="nums text-fg">{available.VARC}</span> VARC,{' '}
-          <span className="nums text-fg">{available.DILR}</span> DILR,{' '}
-          <span className="nums text-fg">{available.QA}</span> QA.{' '}
-          The QA sectional is the useful one until past papers are imported.
+        <p className="mt-4 max-w-[58ch] text-[12px] leading-relaxed text-muted">
+          A full mock needs reading and data-and-logic content — the bank has{' '}
+          <span className="nums text-fg">{available.VARC}</span> verbal,{' '}
+          <span className="nums text-fg">{available.DILR}</span> data-and-logic,{' '}
+          <span className="nums text-fg">{available.QA}</span> quant. The quant
+          sectional works today; a full mock waits on past papers going into ingest.
         </p>
       )}
 
       {report && (
-        <div className="mt-3 rounded border border-border bg-panel-2 px-3 py-2">
-          <p className="text-[12px] text-fg">
+        <div className="settle mt-4 max-w-[58ch] border-t border-border pt-4">
+          <p className="text-[13px] text-fg">
             Assembled{' '}
             {(['VARC', 'DILR', 'QA'] as const)
               .filter((s) => report.filled[s] > 0)
               .map((s) => `${report.filled[s]} ${s}`)
-              .join(' · ')}
+              .join(', ')}
           </p>
           {Object.keys(report.shortfall).length > 0 && (
-            <p className="mt-1 text-[11px] text-bad">
-              Short by{' '}
-              {Object.entries(report.shortfall).map(([s, n]) => `${n} ${s}`).join(', ')} —
-              the bank does not have enough yet, so this mock is smaller than a real paper.
+            <p className="mt-1.5 text-[12px] leading-relaxed text-bad">
+              Short by {Object.entries(report.shortfall).map(([s, n]) => `${n} ${s}`).join(', ')} —
+              the bank doesn&apos;t have enough yet, so this run is smaller than a real paper.
             </p>
           )}
           <button
             type="button" disabled={pending}
             onClick={() => start(async () => { await beginRun(report.mockId); })}
-            className={cn('mt-2 rounded bg-ok px-3 py-1.5 text-[12px] font-medium text-bg hover:opacity-90',
+            className={cn('mt-3 rounded-[2px] bg-ok px-3.5 py-1.5 text-[13px] font-medium text-bg transition-opacity hover:opacity-90',
               pending && 'opacity-50')}
           >
             Start now
           </button>
         </div>
       )}
-    </div>
+    </section>
   );
 }

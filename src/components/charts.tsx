@@ -9,77 +9,121 @@ export function accuracyFill(pct: number): string {
   return 'var(--color-seq-1)';
 }
 
-export function StatTile({
-  label, value, sub, tone = 'default',
-}: { label: string; value: string; sub?: string; tone?: 'default' | 'ok' | 'bad' | 'accent' }) {
+/**
+ * The range row — this interface's one recurring device.
+ *
+ * Every quantity in CAT prep is a position relative to a target, so no
+ * number is shown on its own: the track is the possible span, the fill is
+ * where you are, and the tick is where you need to be.
+ */
+export function Range({
+  label, value, max, target, fill, valueLabel, meta, targetLabel, tone = 'neutral',
+}: {
+  label: string;
+  value: number;
+  max: number;
+  /** position of the target marker on the same scale as `value` */
+  target?: number;
+  fill?: string;
+  valueLabel: string;
+  meta?: string;
+  targetLabel?: string;
+  tone?: 'neutral' | 'ok' | 'bad';
+}) {
+  const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
+  const tPct = target !== undefined && max > 0
+    ? Math.min(100, Math.max(0, (target / max) * 100)) : null;
+
   return (
-    <div className="rounded border border-border bg-panel px-3 py-2.5">
-      <p className="text-[11px] text-faint">{label}</p>
-      <p className={cn('nums mt-1 text-[20px] font-semibold leading-none',
-        tone === 'ok' && 'text-ok', tone === 'bad' && 'text-bad',
-        tone === 'accent' && 'text-accent', tone === 'default' && 'text-fg')}>
-        {value}
-      </p>
-      {sub && <p className="mt-1 text-[11px] text-faint">{sub}</p>}
+    <div className="py-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="truncate text-[13px] text-fg">{label}</span>
+        <span className={cn('nums shrink-0 text-[13px]',
+          tone === 'ok' && 'text-ok', tone === 'bad' && 'text-bad',
+          tone === 'neutral' && 'text-fg')}>
+          {valueLabel}
+        </span>
+      </div>
+
+      <div className="relative mt-2 h-[5px] w-full rounded-[1px] bg-panel-2">
+        <div
+          className="absolute inset-y-0 left-0 rounded-[1px] transition-[width] duration-300"
+          style={{ width: `${pct}%`, background: fill ?? 'var(--color-seq-4)' }}
+        />
+        {tPct !== null && (
+          <span
+            aria-hidden
+            className="absolute -top-[3px] bottom-[-3px] w-px bg-accent"
+            style={{ left: `${tPct}%` }}
+          />
+        )}
+      </div>
+
+      {(meta || targetLabel) && (
+        <div className="mt-1.5 flex items-baseline justify-between gap-3">
+          <span className="text-[11px] text-faint">{meta}</span>
+          {targetLabel && (
+            <span className="nums text-[11px] text-accent">{targetLabel}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 /**
- * Horizontal bar with the value printed at the end of the bar — the direct
- * label the palette validator requires as secondary encoding.
+ * A figure with the context needed to read it. `against` is not decoration —
+ * a number without its target is not information here.
  */
-export function BarRow({
-  label, value, max, fill, valueLabel, meta, warn,
+export function Figure({
+  label, value, against, tone = 'neutral', size = 'md',
 }: {
-  label: string; value: number; max: number; fill: string;
-  valueLabel: string; meta?: string; warn?: boolean;
+  label: string;
+  value: string;
+  against?: string;
+  tone?: 'neutral' | 'ok' | 'bad' | 'signal';
+  size?: 'md' | 'lg';
 }) {
-  const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-1">
-      <div className="min-w-0">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-[12px] text-fg">{label}</span>
-          {meta && <span className="nums shrink-0 text-[11px] text-faint">{meta}</span>}
-        </div>
-        <div className="mt-1 h-2 w-full overflow-hidden rounded-[3px] bg-panel-2">
-          <div
-            className="h-full rounded-[3px]"
-            style={{ width: `${pct}%`, background: fill }}
-          />
-        </div>
-      </div>
-      <span className={cn('nums w-14 text-right text-[12px]', warn ? 'text-bad' : 'text-fg')}>
-        {valueLabel}
-      </span>
+    <div>
+      <p className="text-[12px] text-muted">{label}</p>
+      <p className={cn('nums mt-1.5 leading-none',
+        size === 'lg' ? 'text-[26px] font-light' : 'text-[19px] font-normal',
+        tone === 'ok' && 'text-ok', tone === 'bad' && 'text-bad',
+        tone === 'signal' && 'text-accent', tone === 'neutral' && 'text-fg')}>
+        {value}
+      </p>
+      {against && <p className="mt-1.5 text-[11px] text-faint">{against}</p>}
     </div>
   );
 }
 
-/** Multi-series line chart with direct end labels and no dual axis. */
+/** Multi-series line chart with direct end labels and a single axis. */
 export function TrendChart({
-  series, height = 160, yMax = 100, yLabel,
+  series, height = 170, yMax = 100, yLabel,
 }: {
   series: { name: string; color: string; points: { x: number; y: number }[] }[];
   height?: number; yMax?: number; yLabel?: string;
 }) {
-  const W = 560, H = height, PAD_L = 34, PAD_R = 56, PAD_T = 12, PAD_B = 22;
+  const W = 560, H = height, PAD_L = 30, PAD_R = 54, PAD_T = 10, PAD_B = 20;
   const allX = series.flatMap((s) => s.points.map((p) => p.x));
   if (allX.length === 0) return null;
   const minX = Math.min(...allX), maxX = Math.max(...allX);
   const sx = (x: number) => PAD_L + (maxX === minX ? 0 : ((x - minX) / (maxX - minX)) * (W - PAD_L - PAD_R));
   const sy = (y: number) => PAD_T + (1 - y / yMax) * (H - PAD_T - PAD_B);
-
-  const ticks = [0, 25, 50, 75, 100].filter((t) => t <= yMax);
+  const ticks = [0, 50, 90, 95, 100].filter((t) => t <= yMax);
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img"
       aria-label={`${yLabel ?? 'Trend'} over time for ${series.map((s) => s.name).join(', ')}`}>
       {ticks.map((t) => (
         <g key={t}>
-          <line x1={PAD_L} x2={W - PAD_R} y1={sy(t)} y2={sy(t)} stroke="var(--color-border)" strokeWidth="1" />
-          <text x={PAD_L - 6} y={sy(t) + 3} textAnchor="end" fill="var(--color-faint)" fontSize="9">{t}</text>
+          <line x1={PAD_L} x2={W - PAD_R} y1={sy(t)} y2={sy(t)}
+            stroke={t === 95 ? 'var(--color-accent)' : 'var(--color-border)'}
+            strokeWidth="1" strokeDasharray={t === 95 ? '3 3' : undefined} />
+          <text x={PAD_L - 6} y={sy(t) + 3} textAnchor="end"
+            fill={t === 95 ? 'var(--color-accent)' : 'var(--color-faint)'}
+            fontSize="9" fontFamily="var(--font-mono)">{t}</text>
         </g>
       ))}
       {series.map((s) => {
@@ -88,15 +132,14 @@ export function TrendChart({
         const last = s.points[s.points.length - 1];
         return (
           <g key={s.name}>
-            <path d={d} fill="none" stroke={s.color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+            <path d={d} fill="none" stroke={s.color} strokeWidth="2"
+              strokeLinejoin="round" strokeLinecap="round" />
             {s.points.map((p, i) => (
               <circle key={i} cx={sx(p.x)} cy={sy(p.y)} r="3.5" fill={s.color}
                 stroke="var(--color-panel)" strokeWidth="2" />
             ))}
-            {/* direct label — required secondary encoding for this palette */}
-            <text x={sx(last.x) + 8} y={sy(last.y) + 3} fill="var(--color-muted)" fontSize="10">
-              {s.name}
-            </text>
+            <text x={sx(last.x) + 8} y={sy(last.y) + 3} fill="var(--color-muted)"
+              fontSize="10">{s.name}</text>
           </g>
         );
       })}

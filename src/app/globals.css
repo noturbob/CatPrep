@@ -1,52 +1,58 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ *
- * catprep — dark-first, dense, keyboard-driven.
- * This is a tool used four hours a day, so it reads like a terminal,
- * not like consumer edtech. The one exception is the mock-taking
- * screen, which deliberately mimics the real TCS exam chrome.
+ * CatPrep — "instrument, not dashboard".
+ *
+ * Every quantity in CAT prep is a position relative to a target: days to
+ * the date, accuracy against what a 95th percentile needs, seconds against
+ * a 110s pace. So the interface reads like a measuring instrument — a cool
+ * petrol ground like instrument glass, structure that carries information,
+ * and one recurring device (the range row) wherever a number appears.
+ *
+ * Boldness is spent once, on the countdown. Everything else stays quiet.
+ *
+ * The exam surfaces (mock player, calculator) deliberately ignore all of
+ * this and use hard-coded TCS chrome instead — exam day should feel like
+ * exam day, not like this app.
  * ------------------------------------------------------------------ */
 
 @theme {
-  --color-bg:        #0b0b0d;
-  --color-panel:     #131316;
-  --color-panel-2:   #1a1a1f;
-  --color-border:    #26262c;
-  --color-border-hi: #34343c;
+  --color-bg:        #0a1416;
+  --color-panel:     #0f1d20;
+  --color-panel-2:   #14282c;
+  --color-border:    #1e3a3f;
+  --color-border-hi: #2c555b;
 
-  --color-fg:        #e9e9ec;
-  --color-muted:     #8b8b95;
-  --color-faint:     #5c5c66;
+  --color-fg:        #e4efed;
+  --color-muted:     #8aa9a7;
+  --color-faint:     #5a7a7b;
 
-  /* amber = time pressure: the countdown, the daily target, what's due */
-  --color-accent:    #f5a524;
-  --color-accent-dim:#5c4114;
+  /* Reserved for time and targets. Never decoration. */
+  --color-accent:    #d19a33;
 
-  --color-ok:        #30c46b;
-  --color-ok-dim:    #14412a;
-  --color-bad:       #f04f4f;
-  --color-info:      #4f9cf0;
-  /* Data-series identity. Validated with the dataviz palette checker against
-     the dark surface: lightness band, chroma floor, CVD separation, contrast.
-     The worst adjacent pair (teal/pink) sits at CVD dE 6.7, which is legal
-     only with secondary encoding — so every chart using these DIRECT-LABELS
-     its marks. Do not swap these for prettier hues without re-running
-     scripts/validate_palette.js. UI chrome uses --color-accent instead;
-     text never wears a series colour, it gets a dot beside it. */
+  --color-ok:        #35a06a;
+  --color-bad:       #e05a5a;
+
+  /* Data-series identity. Validated with the dataviz palette checker
+     against this panel colour: lightness band, chroma floor, CVD
+     separation, contrast. Worst adjacent pair (teal/pink) sits at CVD
+     dE 6.7, legal only with secondary encoding — so every chart using
+     these DIRECT-LABELS its marks. Re-run scripts/validate_palette.js
+     before changing any of them. */
   --color-qa:        #c08828;
   --color-dilr:      #17a2b8;
   --color-varc:      #d4568f;
   --color-s4:        #7c6ce0;
 
-  /* Sequential ramp for magnitude (accuracy). Single hue, monotonic L. */
+  /* Sequential ramp for magnitude. Single hue, monotonic lightness. */
   --color-seq-1:     #0d4a53;
   --color-seq-2:     #11626e;
   --color-seq-3:     #167f8f;
   --color-seq-4:     #17a2b8;
   --color-seq-5:     #35bdd0;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
 html { color-scheme: dark; }
@@ -55,15 +61,32 @@ body {
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* tabular figures everywhere numbers matter */
-.nums { font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+/* Every figure is mono and tabular — this app is mostly numbers, and
+   columns of them should line up. */
+.nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero" 1;
+}
 
-::selection { background: #f5a52433; }
+/* The one bold element. Mono at display size reads as a readout rather
+   than as a marketing hero number. */
+.readout {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+}
 
-/* scrollbars that don't shout */
+::selection { background: #d19a3333; }
+
 * { scrollbar-width: thin; scrollbar-color: var(--color-border-hi) transparent; }
 *::-webkit-scrollbar { width: 9px; height: 9px; }
 *::-webkit-scrollbar-thumb {
@@ -73,23 +96,48 @@ body {
 }
 *::-webkit-scrollbar-track { background: transparent; }
 
-/* focus ring: visible, never doubled */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+  border-radius: 2px;
 }
 
-/* prose used for concept notes and worked solutions */
-.prose-cat { line-height: 1.65; }
-.prose-cat p { margin: 0 0 0.75em; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Concept notes and worked solutions. Slightly generous leading because
+   these get read slowly, with a pen in hand. */
+.prose-cat { line-height: 1.7; }
+.prose-cat p { margin: 0 0 0.8em; }
+.prose-cat p:last-child { margin-bottom: 0; }
 .prose-cat strong { color: var(--color-fg); font-weight: 600; }
-.prose-cat ul { margin: 0 0 0.75em; padding-left: 1.15em; list-style: disc; }
-.prose-cat li { margin: 0.3em 0; }
+.prose-cat ul { margin: 0 0 0.8em; padding-left: 1.1em; list-style: none; }
+.prose-cat li { margin: 0.35em 0; position: relative; }
+.prose-cat li::before {
+  content: "";
+  position: absolute;
+  left: -0.9em;
+  top: 0.62em;
+  width: 4px;
+  height: 1px;
+  background: var(--color-border-hi);
+}
 .prose-cat code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: 0.88em;
+  color: var(--color-fg);
   background: var(--color-panel-2);
-  border: 1px solid var(--color-border);
-  border-radius: 3px;
-  padding: 0.08em 0.34em;
+  border-radius: 2px;
+  padding: 0.1em 0.34em;
 }
+
+/* Confirms a state change; never an entrance effect. */
+@keyframes settle {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: none; }
+}
+.settle { animation: settle 160ms ease-out; }

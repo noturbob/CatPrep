@@ -38,20 +38,22 @@ export default async function IngestPage() {
   }));
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-6">
-      <h1 className="text-[13px] font-semibold">Ingest</h1>
-      <p className="mb-5 mt-0.5 max-w-2xl text-[12px] text-muted">
+    <main className="mx-auto w-full max-w-4xl px-5 pb-16 pt-8">
+      <h1 className="text-[19px] font-normal text-fg">Ingest</h1>
+      <p className="mt-2 max-w-[60ch] text-[13px] leading-relaxed text-muted">
         Paste previous-year questions you already have. They are parsed
-        deterministically — no AI, no cost, and every field came from a line you can
+        deterministically — no model, no cost, and every field came from a line you can
         point at. Nothing reaches practice until you approve it.
       </p>
 
-      <section className="mb-8 rounded border border-border bg-panel p-4">
+      <section className="mt-7 border-b border-border pb-7">
         <IngestForm qaTopics={qaTopics} dilrTopics={dilrTopics} />
 
-        <details className="mt-4 border-t border-border pt-3">
-          <summary className="cursor-pointer text-[11px] text-muted">Format the parser understands</summary>
-          <div className="prose-cat mt-2 space-y-2 text-[11px] text-faint">
+        <details className="mt-5 border-t border-border pt-4">
+          <summary className="cursor-pointer text-[12px] text-muted">
+            Format the parser understands
+          </summary>
+          <div className="prose-cat mt-3 max-w-[62ch] space-y-2.5 text-[12px] text-faint">
             <p>
               Questions start with a number: <code>1.</code>, <code>2)</code>, <code>Q.3)</code>.
               Options may sit inline or one per line, bracketed:
@@ -63,9 +65,9 @@ export default async function IngestPage() {
               <code>Difficulty: easy</code> is optional.
             </p>
             <p>
-              <code>PASSAGE: title</code> starts an RC passage and <code>SET: title</code> a
-              DILR caselet — every question after it binds to that passage or set until the
-              next header.
+              <code>PASSAGE: title</code> starts a reading passage and <code>SET: title</code>{' '}
+              a data-and-logic set — every question after it binds to that passage or set until
+              the next header.
             </p>
             <p>
               Separate questions with a blank line. That blank line is how the parser tells the
@@ -75,18 +77,16 @@ export default async function IngestPage() {
         </details>
       </section>
 
-      <section>
-        <h2 className="text-[12px] font-semibold">
+      <section className="py-7">
+        <h2 className="text-[13px] text-fg">
           Staging <span className="nums text-faint">({staged.length})</span>
         </h2>
-        <p className="mb-3 mt-0.5 text-[11px] text-muted">
+        <p className="mb-4 mt-1 max-w-[60ch] text-[12px] leading-relaxed text-muted">
           Read each one before approving. A parser is not a proofreader — a wrong answer here
           teaches you the wrong method.
         </p>
         {staged.length === 0 ? (
-          <p className="rounded border border-border bg-panel py-8 text-center text-[12px] text-faint">
-            Nothing staged.
-          </p>
+          <p className="py-10 text-center text-[13px] text-faint">Nothing staged.</p>
         ) : (
           <StagedList rows={staged} />
         )}

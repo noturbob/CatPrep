@@ -4,16 +4,16 @@ import { attempts } from '@/db/schema';
 import {
   getTopicStats, getErrorTagBreakdown, getDailyActivity, getMockTrend, PACE_TARGET,
 } from '@/lib/tracker';
-import { StatTile, BarRow, TrendChart, accuracyFill } from '@/components/charts';
+import { Range, Figure, TrendChart, accuracyFill } from '@/components/charts';
 import { fmtDuration } from '@/lib/utils';
 import { estimatePercentile, scoreForPercentile } from '@/data/percentiles';
 
 export const dynamic = 'force-dynamic';
 
 const TAG_LABEL: Record<string, string> = {
-  conceptual: 'Concept gap',
-  calculation: 'Calculation slip',
-  misread: 'Misread question',
+  conceptual: "Didn't know the method",
+  calculation: 'Arithmetic slip',
+  misread: 'Misread the question',
   timeout: 'Ran out of time',
 };
 const TAG_COLOR: Record<string, string> = {
@@ -43,167 +43,166 @@ export default async function TrackerPage() {
 
   const practised = tstats.filter((t) => t.attempted > 0);
   const untouched = tstats.filter((t) => t.attempted === 0 && t.section === 'QA');
-  const maxTime = Math.max(PACE_TARGET.QA * 1.5, ...practised.map((t) => t.medianSec));
+  const maxTime = Math.max(PACE_TARGET.QA * 1.6, ...practised.map((t) => t.medianSec));
   const maxTag = Math.max(1, ...tags.map((t) => t.n));
-
-  // Projected QA raw score at the current accuracy, assuming 16 in-scope
-  // questions attempted with CAT marking (+3 / -1 on MCQ).
-  const projected = Math.round(16 * (accuracy / 100) * 3 - 16 * (1 - accuracy / 100) * 1);
+  const maxDay = Math.max(20, ...activity.map((a) => a.attempted));
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6">
-      <h1 className="mb-4 text-[13px] font-semibold">Tracker</h1>
+    <main className="mx-auto w-full max-w-4xl px-5 pb-16 pt-8">
+      <h1 className="text-[19px] font-normal text-fg">Progress</h1>
+      <p className="mt-2 max-w-[60ch] text-[13px] leading-relaxed text-muted">
+        Everything here is measured against what a 95th percentile actually needs, not
+        against your own past scores.
+      </p>
 
-      <section className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-        <StatTile label="Accuracy" value={`${accuracy}%`} sub={`${life.correct}/${life.attempted} correct`}
-          tone={accuracy >= 70 ? 'ok' : accuracy >= 50 ? 'default' : 'bad'} />
-        <StatTile label="Median time / Q" value={`${medianSec}s`} sub={`target ${PACE_TARGET.QA}s`}
-          tone={medianSec > PACE_TARGET.QA ? 'bad' : 'ok'} />
-        <StatTile label="Time on task" value={fmtDuration(life.timeMs)} sub={`${activity.length} active days`} />
-        <StatTile label="Time on wrong answers" value={`${wrongPct}%`}
-          sub="of all practice time" tone={wrongPct > 40 ? 'bad' : 'default'} />
-        <StatTile label="Projected QA raw" value={String(Math.max(0, projected))}
-          sub={`${qaTarget} needed for 95%ile`} tone={projected >= qaTarget ? 'ok' : 'accent'} />
+      <section className="mt-7 grid grid-cols-2 gap-x-8 gap-y-6 border-y border-border py-7 sm:grid-cols-4">
+        <Figure label="Accuracy" value={`${accuracy}%`} against={`${life.correct} of ${life.attempted}`}
+          tone={life.attempted === 0 ? 'neutral' : accuracy >= 70 ? 'ok' : accuracy >= 50 ? 'neutral' : 'bad'} size="lg" />
+        <Figure label="Median per question" value={`${medianSec}s`} against={`${PACE_TARGET.QA}s is the pace`}
+          tone={life.attempted === 0 ? 'neutral' : medianSec > PACE_TARGET.QA ? 'bad' : 'ok'} size="lg" />
+        <Figure label="Time on task" value={fmtDuration(life.timeMs)}
+          against={`${activity.length} active ${activity.length === 1 ? 'day' : 'days'}`} size="lg" />
+        <Figure label="Spent on wrong answers" value={`${wrongPct}%`} against="of all practice time"
+          tone={wrongPct > 40 ? 'bad' : 'neutral'} size="lg" />
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* ------------------------------------------------ topic mastery */}
-        <section className="rounded border border-border bg-panel p-4">
-          <h2 className="text-[12px] font-semibold">Topic mastery</h2>
-          <p className="mb-3 mt-0.5 text-[11px] text-faint">
-            Accuracy per in-scope topic. Darker means weaker.
+      {/* ------------------------------------------------- topic mastery */}
+      <section className="border-b border-border py-7">
+        <h2 className="text-[13px] text-fg">Accuracy by topic</h2>
+        <p className="mb-4 mt-1 text-[12px] text-muted">
+          The marker sits at 70%, roughly where quant stops costing you marks.
+        </p>
+        {practised.length === 0 ? (
+          <p className="py-6 text-[13px] text-faint">
+            Nothing attempted yet. This fills in after your first session.
           </p>
-          {practised.length === 0 ? (
-            <p className="py-6 text-center text-[12px] text-faint">No attempts yet.</p>
-          ) : (
-            <div className="divide-y divide-border">
-              {practised.map((t) => (
-                <BarRow
-                  key={t.slug}
-                  label={t.name}
-                  value={t.accuracy}
-                  max={100}
-                  fill={accuracyFill(t.accuracy)}
-                  valueLabel={`${t.accuracy}%`}
-                  meta={`n=${t.attempted}`}
-                />
-              ))}
-            </div>
-          )}
-          {untouched.length > 0 && (
-            <p className="mt-3 border-t border-border pt-2 text-[11px] text-faint">
-              Not started yet: {untouched.map((t) => t.name).join(', ')}
-            </p>
-          )}
-        </section>
-
-        {/* -------------------------------------------------- speed vs target */}
-        <section className="rounded border border-border bg-panel p-4">
-          <h2 className="text-[12px] font-semibold">Speed vs target</h2>
-          <p className="mb-3 mt-0.5 text-[11px] text-faint">
-            Median seconds per question. QA target is {PACE_TARGET.QA}s — red means slower.
-          </p>
-          {practised.length === 0 ? (
-            <p className="py-6 text-center text-[12px] text-faint">No attempts yet.</p>
-          ) : (
-            <div className="divide-y divide-border">
-              {practised.map((t) => {
-                const target = PACE_TARGET[t.section as keyof typeof PACE_TARGET] ?? PACE_TARGET.QA;
-                const over = t.medianSec > target;
-                return (
-                  <BarRow
-                    key={t.slug}
-                    label={t.name}
-                    value={t.medianSec}
-                    max={maxTime}
-                    fill={over ? 'var(--color-bad)' : 'var(--color-ok)'}
-                    valueLabel={`${t.medianSec}s`}
-                    warn={over}
-                    meta={over ? `+${t.medianSec - target}s` : `−${target - t.medianSec}s`}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* ------------------------------------------------ error breakdown */}
-        <section className="rounded border border-border bg-panel p-4">
-          <h2 className="text-[12px] font-semibold">Why you lose marks</h2>
-          <p className="mb-3 mt-0.5 text-[11px] text-faint">
-            Concept gaps need study. Calculation slips need the calculator and slower reading.
-          </p>
-          {tags.length === 0 ? (
-            <p className="py-6 text-center text-[12px] text-faint">
-              No tagged errors yet — tag them right after each wrong answer.
-            </p>
-          ) : (
-            <div className="divide-y divide-border">
-              {tags.map((t) => (
-                <BarRow
-                  key={t.tag}
-                  label={TAG_LABEL[t.tag] ?? t.tag}
-                  value={t.n}
-                  max={maxTag}
-                  fill={TAG_COLOR[t.tag] ?? 'var(--color-qa)'}
-                  valueLabel={String(t.n)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* ------------------------------------------------------ mock trend */}
-        <section className="rounded border border-border bg-panel p-4">
-          <h2 className="text-[12px] font-semibold">Mock percentile trend</h2>
-          <p className="mb-3 mt-0.5 text-[11px] text-faint">
-            Estimated from published score-vs-percentile reports, not official data.
-          </p>
-          {mocks.length === 0 ? (
-            <p className="py-6 text-center text-[12px] text-faint">
-              No mocks taken yet. First one is scheduled for 18 October.
-            </p>
-          ) : (
-            <TrendChart
-              yLabel="Percentile"
-              series={(['QA', 'DILR', 'VARC'] as const).map((sec, i) => ({
-                name: sec,
-                color: ['var(--color-qa)', 'var(--color-dilr)', 'var(--color-varc)'][i],
-                points: mocks.map((m, x) => ({
-                  x,
-                  y: estimatePercentile(sec, ((m.score as Record<string, number> | null)?.[sec] ?? 0)),
-                })),
-              }))}
-            />
-          )}
-        </section>
-      </div>
-
-      {/* --------------------------------------------------- activity strip */}
-      <section className="mt-4 rounded border border-border bg-panel p-4">
-        <h2 className="text-[12px] font-semibold">Daily volume</h2>
-        <p className="mb-3 mt-0.5 text-[11px] text-faint">Questions attempted per day.</p>
-        {activity.length === 0 ? (
-          <p className="py-4 text-center text-[12px] text-faint">Nothing logged yet.</p>
         ) : (
-          <div className="flex items-end gap-1 overflow-x-auto pb-1" style={{ minHeight: 64 }}>
-            {activity.map((d) => {
-              const max = Math.max(...activity.map((a) => a.attempted), 20);
-              const h = Math.max(3, (d.attempted / max) * 52);
-              const acc = d.attempted ? Math.round((d.correct / d.attempted) * 100) : 0;
+          <div className="divide-y divide-border">
+            {practised.map((t) => (
+              <Range
+                key={t.slug} label={t.name}
+                value={t.accuracy} max={100} target={70}
+                fill={accuracyFill(t.accuracy)}
+                valueLabel={`${t.accuracy}%`}
+                meta={`${t.correct} of ${t.attempted}`}
+                tone={t.accuracy >= 70 ? 'ok' : t.accuracy < 50 ? 'bad' : 'neutral'}
+              />
+            ))}
+          </div>
+        )}
+        {untouched.length > 0 && (
+          <p className="mt-4 text-[12px] leading-relaxed text-faint">
+            Not started: {untouched.map((t) => t.name).join(', ')}.
+          </p>
+        )}
+      </section>
+
+      {/* ---------------------------------------------------------- speed */}
+      <section className="border-b border-border py-7">
+        <h2 className="text-[13px] text-fg">Speed by topic</h2>
+        <p className="mb-4 mt-1 text-[12px] text-muted">
+          Median seconds per question. Past the marker and the section runs out before you do.
+        </p>
+        {practised.length === 0 ? (
+          <p className="py-6 text-[13px] text-faint">Nothing attempted yet.</p>
+        ) : (
+          <div className="divide-y divide-border">
+            {practised.map((t) => {
+              const target = PACE_TARGET[t.section as keyof typeof PACE_TARGET] ?? PACE_TARGET.QA;
+              const over = t.medianSec > target;
               return (
-                <div key={d.day} className="group relative flex shrink-0 flex-col items-center gap-1">
-                  <div
-                    className="w-4 rounded-[2px]"
-                    style={{ height: h, background: accuracyFill(acc) }}
-                    title={`${d.day}: ${d.attempted} attempted, ${acc}% correct`}
-                  />
-                  <span className="nums text-[9px] text-faint">{d.day.slice(8)}</span>
-                </div>
+                <Range
+                  key={t.slug} label={t.name}
+                  value={t.medianSec} max={maxTime} target={target}
+                  fill={over ? 'var(--color-bad)' : 'var(--color-ok)'}
+                  valueLabel={`${t.medianSec}s`}
+                  meta={over ? `${t.medianSec - target}s over` : `${target - t.medianSec}s in hand`}
+                  tone={over ? 'bad' : 'ok'}
+                />
               );
             })}
           </div>
         )}
+      </section>
+
+      {/* --------------------------------------------------- error causes */}
+      <section className="border-b border-border py-7">
+        <h2 className="text-[13px] text-fg">Why marks are going</h2>
+        <p className="mb-4 mt-1 max-w-[60ch] text-[12px] leading-relaxed text-muted">
+          Method gaps need study. Arithmetic slips need the calculator and a slower read.
+          They are different problems, so they get fixed differently.
+        </p>
+        {tags.length === 0 ? (
+          <p className="py-6 text-[13px] text-faint">
+            No causes logged yet. Tag each wrong answer as you go — it takes one tap and it is
+            the only way this page can tell you anything useful.
+          </p>
+        ) : (
+          <div className="divide-y divide-border">
+            {tags.map((t) => (
+              <Range
+                key={t.tag} label={TAG_LABEL[t.tag] ?? t.tag}
+                value={t.n} max={maxTag} fill={TAG_COLOR[t.tag] ?? 'var(--color-qa)'}
+                valueLabel={String(t.n)}
+                meta={t.n === 1 ? 'once' : `${t.n} times`}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ----------------------------------------------------- mock trend */}
+      <section className="border-b border-border py-7">
+        <h2 className="text-[13px] text-fg">Mock percentiles</h2>
+        <p className="mb-4 mt-1 text-[12px] text-muted">
+          Estimated from published score reports. The dotted line is 95.
+        </p>
+        {mocks.length === 0 ? (
+          <p className="py-6 text-[13px] text-faint">
+            No mocks yet. The first one is scheduled for 18 October.
+          </p>
+        ) : (
+          <TrendChart
+            yLabel="Percentile"
+            series={(['QA', 'DILR', 'VARC'] as const).map((sec, i) => ({
+              name: sec,
+              color: ['var(--color-qa)', 'var(--color-dilr)', 'var(--color-varc)'][i],
+              points: mocks.map((m, x) => ({
+                x, y: estimatePercentile(sec, (m.score as Record<string, number> | null)?.[sec] ?? 0),
+              })),
+            }))}
+          />
+        )}
+      </section>
+
+      {/* -------------------------------------------------- daily volume */}
+      <section className="py-7">
+        <h2 className="text-[13px] text-fg">Daily volume</h2>
+        <p className="mb-4 mt-1 text-[12px] text-muted">
+          Questions attempted each day, shaded by that day&apos;s accuracy.
+        </p>
+        {activity.length === 0 ? (
+          <p className="py-6 text-[13px] text-faint">Nothing logged yet.</p>
+        ) : (
+          <ul className="flex items-end gap-[3px] overflow-x-auto pb-1">
+            {activity.map((d) => {
+              const acc = d.attempted ? Math.round((d.correct / d.attempted) * 100) : 0;
+              return (
+                <li key={d.day} className="flex shrink-0 flex-col items-center gap-1.5">
+                  <span
+                    className="w-[13px] rounded-[1px]"
+                    style={{ height: Math.max(3, (d.attempted / maxDay) * 56), background: accuracyFill(acc) }}
+                    title={`${d.day}: ${d.attempted} attempted, ${acc}% correct`}
+                  />
+                  <span className="nums text-[9px] text-faint">{d.day.slice(8)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <p className="mt-4 text-[12px] text-faint">
+          Quant target is {qaTarget} raw marks out of 66.
+        </p>
       </section>
     </main>
   );

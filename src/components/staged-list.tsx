@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 import { approveStaged, discardStaged } from '@/app/(app)/admin/ingest/actions';
-import { cn } from '@/lib/utils';
 
 export type StagedRow = {
   id: number;
@@ -47,7 +46,7 @@ export function StagedList({ rows }: { rows: StagedRow[] }) {
 
   return (
     <div>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <button
           type="button" disabled={pending || clean.length === 0}
           onClick={() => run(async () => {
@@ -55,7 +54,7 @@ export function StagedList({ rows }: { rows: StagedRow[] }) {
             setMsg(`Approved ${r.approved}. They are in practice from now on.`);
             setSel(new Set());
           })}
-          className="rounded bg-ok px-3 py-1.5 text-[12px] font-medium text-bg hover:opacity-90 disabled:opacity-40"
+          className="rounded-[2px] bg-ok px-3.5 py-1.5 text-[13px] font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           Approve all {clean.length} clean
         </button>
@@ -68,7 +67,7 @@ export function StagedList({ rows }: { rows: StagedRow[] }) {
               : `Approved ${r.approved}.`);
             setSel(new Set());
           })}
-          className="rounded border border-border px-3 py-1.5 text-[12px] text-fg hover:border-border-hi disabled:opacity-40"
+          className="rounded-[2px] border border-border px-3.5 py-1.5 text-[13px] text-fg transition-colors hover:border-border-hi disabled:opacity-40"
         >
           Approve selected ({sel.size})
         </button>
@@ -79,44 +78,44 @@ export function StagedList({ rows }: { rows: StagedRow[] }) {
             setMsg(`Discarded ${sel.size}.`);
             setSel(new Set());
           })}
-          className="rounded border border-bad/50 px-3 py-1.5 text-[12px] text-bad hover:border-bad disabled:opacity-40"
+          className="text-[13px] text-bad underline decoration-bad/40 underline-offset-2 disabled:opacity-40"
         >
           Discard selected
         </button>
-        {msg && <span role="status" className="text-[12px] text-muted">{msg}</span>}
+        {msg && <span role="status" className="settle text-[13px] text-muted">{msg}</span>}
       </div>
 
-      <ul className="space-y-2">
+      <ul className="divide-y divide-border border-y border-border">
         {rows.map((q) => {
           const bad = blockers(q);
           return (
-            <li key={q.id} className={cn('rounded border bg-panel px-3 py-2',
-              bad.length ? 'border-bad/40' : 'border-border')}>
-              <label className="flex cursor-pointer items-start gap-2.5">
+            <li key={q.id} className="py-3">
+              <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox" checked={sel.has(q.id)} onChange={() => toggle(q.id)}
                   className="mt-1 accent-[var(--color-accent)]"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-faint">
-                    <span>{q.topicName}</span><span>·</span><span>{q.type}</span>
-                    <span>·</span><span>{q.difficulty}</span>
+                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-faint">
+                    <span>{q.topicName}</span>
+                    <span>{q.type}</span>
+                    <span>{q.difficulty}</span>
                     {q.contextKind && (
-                      <><span>·</span><span className="text-varc">
-                        {q.contextKind === 'rc_passage' ? 'RC passage' : 'DILR set'}
-                      </span></>
+                      <span className="text-varc">
+                        {q.contextKind === 'rc_passage' ? 'reading passage' : 'data & logic set'}
+                      </span>
                     )}
-                    {q.batchLabel && <><span>·</span><span>{q.batchLabel}</span></>}
+                    {q.batchLabel && <span>{q.batchLabel}</span>}
                   </div>
-                  <p className="mt-1 text-[12px] text-fg">{q.stem}</p>
-                  {q.options && <p className="mt-1 text-[11px] text-muted">{q.options.join('  ·  ')}</p>}
-                  <p className="mt-1 text-[11px]">
+                  <p className="mt-1.5 text-[13px] text-fg">{q.stem}</p>
+                  {q.options && <p className="mt-1 text-[12px] text-muted">{q.options.join('   ')}</p>}
+                  <p className="mt-1 text-[12px]">
                     <span className="text-faint">answer </span>
                     <span className="nums text-ok">{q.answer || '—'}</span>
                   </p>
                   {bad.length > 0 && (
-                    <p className="mt-1 text-[11px] text-bad">
-                      cannot approve: {bad.join(' · ')} — fix it in the source and re-import
+                    <p className="mt-1 text-[12px] text-bad">
+                      cannot approve — {bad.join(', ')}. Fix it in the source and re-import.
                     </p>
                   )}
                 </div>
