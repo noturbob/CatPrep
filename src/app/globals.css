@@ -1,143 +1,244 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------ *
- * CatPrep — "instrument, not dashboard".
- *
- * Every quantity in CAT prep is a position relative to a target: days to
- * the date, accuracy against what a 95th percentile needs, seconds against
- * a 110s pace. So the interface reads like a measuring instrument — a cool
- * petrol ground like instrument glass, structure that carries information,
- * and one recurring device (the range row) wherever a number appears.
- *
- * Boldness is spent once, on the countdown. Everything else stays quiet.
- *
- * The exam surfaces (mock player, calculator) deliberately ignore all of
- * this and use hard-coded TCS chrome instead — exam day should feel like
- * exam day, not like this app.
- * ------------------------------------------------------------------ */
+/* "Crayon-coded terminal on cream paper" (MotherDuck reference), dark theme in
+   Magic UI's neutral scale. Semantic tokens switch with .dark; the crayon colours
+   don't. Shapes are fixed: 2px corners, zero-blur offset shadows, mono type. */
 
 @theme {
-  --color-bg:        #0a1416;
-  --color-panel:     #0f1d20;
-  --color-panel-2:   #14282c;
-  --color-border:    #1e3a3f;
-  --color-border-hi: #2c555b;
+  --color-sky: #6fc2ff;
+  --color-canary: #ffde00;
+  --color-orange: #ff9538;
+  --color-coral: #f38e84;
+  --color-peach: #f5b161;
+  --color-mint: #38c1b0;
+  --color-lilac: #b291de;
+  --color-lime: #b3c419;
+  --color-periwinkle: #7597ee;
+  --color-slate: #84a6bc;
+  --color-marigold: #e1c427;
+  --color-charcoal: #383838;
 
-  --color-fg:        #e4efed;
-  --color-muted:     #8aa9a7;
-  --color-faint:     #5a7a7b;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Reserved for time and targets. Never decoration. */
-  --color-accent:    #d19a33;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.4;
+  --text-body: 14px;
+  --text-body--line-height: 1.6;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.6;
+  --text-sub: 18px;
+  --text-sub--line-height: 1.4;
+  --text-h3: 24px;
+  --text-h3--line-height: 1.3;
+  --text-h2: clamp(24px, 6vw, 32px);
+  --text-h2--line-height: 1.2;
+  --text-h1: clamp(28px, 7vw, 40px);
+  --text-h1--line-height: 1.2;
+  --text-display: clamp(40px, 11vw, 56px);
+  --text-display--line-height: 1;
 
-  --color-ok:        #35a06a;
-  --color-bad:       #e05a5a;
-
-  /* Data-series identity. Validated with the dataviz palette checker
-     against this panel colour: lightness band, chroma floor, CVD
-     separation, contrast. Worst adjacent pair (teal/pink) sits at CVD
-     dE 6.7, legal only with secondary encoding — so every chart using
-     these DIRECT-LABELS its marks. Re-run scripts/validate_palette.js
-     before changing any of them. */
-  --color-qa:        #c08828;
-  --color-dilr:      #17a2b8;
-  --color-varc:      #d4568f;
-  --color-s4:        #7c6ce0;
-
-  /* Sequential ramp for magnitude. Single hue, monotonic lightness. */
-  --color-seq-1:     #0d4a53;
-  --color-seq-2:     #11626e;
-  --color-seq-3:     #167f8f;
-  --color-seq-4:     #17a2b8;
-  --color-seq-5:     #35bdd0;
-
-  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+  --radius-sm: 2px;
 }
 
-html { color-scheme: dark; }
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-chalk: var(--chalk);
+  --color-wash: var(--wash);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-faint: var(--faint);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --paper: #f4efea;
+  --card: #ffffff;
+  --chalk: #f8f8f7;
+  --wash: #ebf9ff;
+  --ink: #383838;
+  /* Darker than the reference's #a1a1a1 so helper text passes 4.5:1 on cream. */
+  --muted: #666666;
+  --line: #383838;
+  --faint: #c0c0c0;
+  --shadow: #383838;
+  /* DI bar chart series, validated light steps */
+  --bar-r24: #6fb4f0;
+  --bar-r25: #2a6db5;
+  --bar-p25: #f08a3a;
+  /* IIM weightage: CAT, interview, WAT/GD, profile */
+  --w-cat: #2a6db5;
+  --w-pi: #f08a3a;
+  --w-wat: #2f9e8f;
+  --w-profile: #9a76cf;
+  color-scheme: light;
+}
+
+.dark {
+  --paper: #0a0a0a;
+  --card: #171717;
+  --chalk: #1f1f1f;
+  --wash: #10222f;
+  --ink: #f4efea;
+  --muted: #a3a3a3;
+  --line: #d6d1cc;
+  --faint: #404040;
+  --shadow: #d6d1cc;
+  /* DI bar chart series, validated dark steps */
+  --bar-r24: #5898d3;
+  --bar-r25: #2560b8;
+  --bar-p25: #d9732a;
+  --w-cat: #3a78c4;
+  --w-pi: #d9732a;
+  --w-wat: #2f9e8f;
+  --w-profile: #9a76cf;
+  color-scheme: dark;
+}
+
+html {
+  background: var(--paper);
+  scroll-padding-top: 24px;
+}
 
 body {
-  background: var(--color-bg);
-  color: var(--color-fg);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* Every figure is mono and tabular — this app is mostly numbers, and
-   columns of them should line up. */
-.nums {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 1;
 }
 
-/* The one bold element. Mono at display size reads as a readout rather
-   than as a marketing hero number. */
-.readout {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 300;
-  letter-spacing: -0.04em;
-  line-height: 0.85;
-}
-
-::selection { background: #d19a3333; }
-
-* { scrollbar-width: thin; scrollbar-color: var(--color-border-hi) transparent; }
-*::-webkit-scrollbar { width: 9px; height: 9px; }
-*::-webkit-scrollbar-thumb {
-  background: var(--color-border-hi);
-  border-radius: 5px;
-  border: 2px solid var(--color-bg);
-}
-*::-webkit-scrollbar-track { background: transparent; }
+::selection { background: var(--color-canary); color: #383838; }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-sky);
   outline-offset: 2px;
+}
+
+/* ---------- elevation: one hard offset shadow, never blurred ---------- */
+
+@layer components {
+.lift { box-shadow: -6px 6px 0 0 var(--shadow); }
+
+/* Buttons press into their shadow. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border: 2px solid var(--line);
   border-radius: 2px;
+  font-weight: 500;
+  font-size: 14px;
+  box-shadow: -6px 6px 0 0 var(--shadow);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.btn:hover { transform: translate(-6px, 6px); box-shadow: 0 0 0 0 var(--shadow); }
+.btn:active { transform: none; box-shadow: -6px 6px 0 0 var(--shadow); }
+.btn-primary { background: var(--color-sky); color: #383838; border-color: #383838; }
+.btn-secondary { background: var(--card); color: var(--ink); }
+}
+
+/* ---------- marquee ---------- */
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee-track { animation: marquee 90s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+/* ---------- the one page-load moment: hero lines settle in slowly ---------- */
+
+@keyframes blur-in {
+  from { opacity: 0; filter: blur(8px); transform: translateY(10px); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+.blur-in { animation: blur-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes fill-in { from { background: transparent; } }
+.cell-fill { animation: fill-in 600ms ease both; }
+
+/* ---------- disclosure: solutions open slowly where the browser can animate it ---------- */
+
+details.reveal::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition: block-size 450ms ease, content-visibility 450ms allow-discrete;
+}
+details.reveal[open]::details-content { block-size: auto; }
+:root { interpolate-size: allow-keywords; }
+details.reveal > summary { list-style: none; cursor: pointer; }
+details.reveal > summary::-webkit-details-marker { display: none; }
+details.reveal > summary .chev { transition: transform 300ms ease; }
+details.reveal[open] > summary .chev { transform: rotate(90deg); }
+
+/* ---------- theme switch: Magic UI's circular view-transition reveal, slowed ---------- */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Sun shows in dark mode (switch to light), moon in light. */
+.dark .icon-moon, :root:not(.dark) .icon-sun { display: none; }
+
+.katex { font-size: 1.15em; }
+@media (max-width: 639px) { .katex { font-size: 0.95em; } }
+
+/* Themes switch instantly underneath the circular reveal: no element runs its own colour or
+   shadow transition while the view transition is in flight, which is what made it jitter. */
+.theme-switching *, .theme-switching *::before, .theme-switching *::after { transition: none !important; }
+
+/* ---------- tables become labelled cards below tablet width ---------- */
+
+@media (max-width: 767px) {
+  table.stack thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  table.stack, table.stack tbody, table.stack tr { display: block; width: 100%; }
+  table.stack tr { padding: 12px 14px; }
+  table.stack td {
+    display: grid;
+    grid-template-columns: minmax(88px, 38%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 3px 0;
+    overflow-wrap: anywhere;
+  }
+  table.stack td::before { content: attr(data-label); color: var(--muted); font-size: 12px; font-weight: 400; }
+  table.stack td:first-child { display: block; padding-bottom: 6px; font-weight: 600; font-size: 16px; }
+  table.stack td:first-child::before, table.stack td[data-label=""]::before { content: none; }
+  table.stack td[data-label=""] { display: block; }
+}
+
+/* Wide tables (many columns of prose) stack up to tablet-landscape width. */
+@media (max-width: 1023px) {
+  table.stack-lg thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  table.stack-lg, table.stack-lg tbody, table.stack-lg tr { display: block; width: 100%; }
+  table.stack-lg tr { padding: 12px 14px; }
+  table.stack-lg td {
+    display: grid;
+    grid-template-columns: minmax(88px, 38%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 3px 0;
+    overflow-wrap: anywhere;
+  }
+  table.stack-lg td::before { content: attr(data-label); color: var(--muted); font-size: 12px; font-weight: 400; }
+  table.stack-lg td:first-child { display: block; padding-bottom: 6px; font-weight: 600; font-size: 16px; }
+  table.stack-lg td:first-child::before, table.stack-lg td[data-label=""]::before { content: none; }
+  table.stack-lg td[data-label=""] { display: block; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .marquee-track { animation: none; }
 }
-
-/* Concept notes and worked solutions. Slightly generous leading because
-   these get read slowly, with a pen in hand. */
-.prose-cat { line-height: 1.7; }
-.prose-cat p { margin: 0 0 0.8em; }
-.prose-cat p:last-child { margin-bottom: 0; }
-.prose-cat strong { color: var(--color-fg); font-weight: 600; }
-.prose-cat ul { margin: 0 0 0.8em; padding-left: 1.1em; list-style: none; }
-.prose-cat li { margin: 0.35em 0; position: relative; }
-.prose-cat li::before {
-  content: "";
-  position: absolute;
-  left: -0.9em;
-  top: 0.62em;
-  width: 4px;
-  height: 1px;
-  background: var(--color-border-hi);
-}
-.prose-cat code {
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-  color: var(--color-fg);
-  background: var(--color-panel-2);
-  border-radius: 2px;
-  padding: 0.1em 0.34em;
-}
-
-/* Confirms a state change; never an entrance effect. */
-@keyframes settle {
-  from { opacity: 0; transform: translateY(-2px); }
-  to   { opacity: 1; transform: none; }
-}
-.settle { animation: settle 160ms ease-out; }

@@ -1,38 +1,53 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
+import "katex/dist/katex.min.css";
 import "./globals.css";
+import { Footer } from "@/components/footer";
+import { Nav } from "@/components/nav";
 
-// Plex for its technical heritage and its tabular numerals — this app is
-// mostly figures, and they need to line up in columns.
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
+// Stand-in for Aeonik Mono (commercial); same open, technical mono voice.
+const mono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600"],
 });
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-});
+
+const SITE =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
+
+const description = "CAT 2026 in 55 days: the 95th percentile in VARC, DILR and QA, plus a percentile calculator, IIM cutoffs and the top 50 schools.";
 
 export const metadata: Metadata = {
-  title: "catprep",
-  description: "Targeted CAT 2026 preparation — daily practice, mocks, tracker, IIM inbox.",
+  metadataBase: new URL(SITE),
+  title: { default: "catprep — CAT 2026", template: "%s · catprep" },
+  description,
+  applicationName: "catprep",
+  openGraph: { type: "website", siteName: "catprep", title: "catprep — 95th in every section", description, locale: "en_IN" },
+  twitter: { card: "summary_large_image", title: "catprep — 95th in every section", description },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a1416",
-  width: "device-width",
-  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4efea" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
 };
+
+// Runs before paint so a saved dark theme never flashes cream.
+const themeScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={mono.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="flex min-h-dvh flex-col">
+        <Nav />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }

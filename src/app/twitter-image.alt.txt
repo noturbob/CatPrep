@@ -1,0 +1,1 @@
+catprep: 95th in every section. Targets for VARC (12 correct), DILR (2.5 sets) and QA (9 correct) for CAT 2026 on 29 November.
