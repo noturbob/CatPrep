@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { StarButton } from "./star-button";
 import { ThemeToggle } from "./theme-toggle";
 
 const SECTIONS = [
@@ -82,6 +83,7 @@ export function Nav() {
           ))}
         </ul>
         <div className="ml-auto flex items-center gap-2">
+          <StarButton />
           <ThemeToggle />
           <button
             onClick={() => setOpenOn(open ? null : path)}
