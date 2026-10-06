@@ -3,20 +3,46 @@
 import { useEffect, useState } from "react";
 
 const REPO = "noturbob/CatPrep";
+// GitHub allows 60 unauthenticated requests an hour per visitor and caches answers for 60s,
+// so polling faster than this buys nothing and risks the limit.
+const POLL_MS = 2 * 60_000;
+const MIN_GAP_MS = 20_000;
 
 const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10_000 ? 0 : 1)}k` : String(n));
 
-/** Links to the repo with its live star count. Without the count (offline, rate-limited) it still works as a link. */
+/**
+ * Links to the repo with its live star count. Re-asks GitHub when the visitor comes back to the
+ * tab (typically after starring) and every two minutes while it's visible. On any failure it
+ * keeps the last count, or shows just "Star".
+ */
 export function StarButton() {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
-    const ctrl = new AbortController();
-    fetch(`https://api.github.com/repos/${REPO}`, { signal: ctrl.signal })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => typeof d?.stargazers_count === "number" && setStars(d.stargazers_count))
-      .catch(() => {});
-    return () => ctrl.abort();
+    let last = 0;
+    let ctrl: AbortController | null = null;
+
+    const load = () => {
+      if (document.visibilityState !== "visible" || Date.now() - last < MIN_GAP_MS) return;
+      last = Date.now();
+      ctrl?.abort();
+      ctrl = new AbortController();
+      fetch(`https://api.github.com/repos/${REPO}`, { signal: ctrl.signal, cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => typeof d?.stargazers_count === "number" && setStars(d.stargazers_count))
+        .catch(() => {});
+    };
+
+    load();
+    const timer = setInterval(load, POLL_MS);
+    document.addEventListener("visibilitychange", load);
+    window.addEventListener("focus", load);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", load);
+      window.removeEventListener("focus", load);
+      ctrl?.abort();
+    };
   }, []);
 
   return (
@@ -33,7 +59,9 @@ export function StarButton() {
         </svg>
         <span className="max-sm:hidden">Star</span>
       </span>
-      {stars !== null && <span className="flex h-full items-center border-l-2 border-line px-2.5">{compact(stars)}</span>}
+      {stars !== null && (
+        <span aria-live="polite" className="flex h-full items-center border-l-2 border-line px-2.5">{compact(stars)}</span>
+      )}
     </a>
   );
 }
