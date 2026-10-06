@@ -12,9 +12,9 @@ const mono = JetBrains_Mono({
   weight: ["300", "400", "500", "600"],
 });
 
-const SITE =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
+// The canonical address. Vercel's VERCEL_PROJECT_PRODUCTION_URL can name a different alias of the
+// same project, which left share previews pointing at a domain that didn't serve them.
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://catprep-95.vercel.app";
 
 const description = "CAT 2026 in 55 days: the 95th percentile in VARC, DILR and QA, plus a percentile calculator, IIM cutoffs and the top 50 schools.";
 

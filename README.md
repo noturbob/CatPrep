@@ -34,8 +34,8 @@ pnpm test    # plan date maths, percentile interpolation, and DI chart data agai
 pnpm build
 ```
 
-Set `NEXT_PUBLIC_SITE_URL` to the deployed origin so social previews resolve to absolute URLs. On Vercel the
-production URL is picked up automatically.
+Live at [catprep-95.vercel.app](https://catprep-95.vercel.app). Social previews use that address; set
+`NEXT_PUBLIC_SITE_URL` to override it on another host. No other environment variables are needed.
 
 ## Licence
 
