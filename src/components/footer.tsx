@@ -29,12 +29,7 @@ export function Footer() {
           ))}
         </nav>
 
-        <div className="mt-12 space-y-2 border-t border-faint pt-8 text-caption text-muted">
-          <p>
-            Built from four guides: Quant (4 Oct 2026) and VARC, DILR and Admissions (6 Oct 2026). Every worked example,
-            passage, set and practice question is original, written to mirror recurring CAT patterns; none is a
-            past-paper question.
-          </p>
+        <div className="mt-12 border-t border-faint pt-8 text-caption text-muted">
           <p>
             Data from Careers360, Cracku, IMS and iQuanta, as of 6 October 2026. Cutoffs and dates move every year, so
             confirm on each institute’s site before applying. Not affiliated with the IIMs or the CAT conducting body.
